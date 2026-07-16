@@ -12,7 +12,7 @@
 		"toggleTheme": "Change theme",
 		"hideBackground": "Hide background",
 		"restoreBackground": "Restore background",
-		"toggleMap": "Toggle map panel",
+		"toggleMap": "Toggle globe panel",
 		"toggleServices": "Toggle service panel",
 		"toggleServerView": "Toggle server view",
 		"serverGroups": "Server groups"
@@ -35,6 +35,9 @@
 	"info": {
 		"pageLoading": "Loading resources...",
 		"loadingNodes": "Loading nodes...",
+		"loadingGlobeResources": "Loading globe resources...",
+		"loadingServiceResources": "Loading service resources...",
+		"loadingGlobeAndServiceResources": "Loading globe and service resources...",
 		"websocketConnecting": "WebSocket connecting",
 		"websocketConnected": "WebSocket connected",
 		"websocketDisconnected": "WebSocket disconnected",

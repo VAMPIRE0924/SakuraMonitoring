@@ -1,8 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type React from "react";
+import { useNavigate } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "@/App";
+import { CommandProvider } from "@/context/command-provider";
+import { useCommand } from "@/hooks/use-command";
 import { createTestQueryClient } from "@/test/utils";
 
 const appMocks = vi.hoisted(() => ({
@@ -19,14 +22,31 @@ vi.mock("../sakura/SakuraServerDetail", () => ({
 	default: () => <div>sakura-server-detail-page</div>,
 }));
 
+vi.mock("../components/DashCommand", () => ({
+	DashCommand: () => {
+		const navigate = useNavigate();
+		return (
+			<button type="button" onClick={() => navigate("/server/42")}>
+				command-overlay
+			</button>
+		);
+	},
+}));
+
 vi.mock("../sakura/SakuraShell", () => ({
 	SakuraRefreshToast: () => <div>refresh-toast</div>,
-	SakuraShell: ({ children }: { children: React.ReactNode }) => (
-		<div>
-			<div>sakura-shell</div>
-			{children}
-		</div>
-	),
+	SakuraShell: ({ children }: { children: React.ReactNode }) => {
+		const { openCommand } = useCommand();
+		return (
+			<div>
+				<div>sakura-shell</div>
+				<button type="button" onClick={openCommand}>
+					open-search
+				</button>
+				{children}
+			</div>
+		);
+	},
 }));
 
 vi.mock("../hooks/use-theme", () => ({
@@ -68,7 +88,9 @@ function renderApp(
 
 	return render(
 		<QueryClientProvider client={queryClient}>
-			<App />
+			<CommandProvider>
+				<App />
+			</CommandProvider>
 		</QueryClientProvider>,
 	);
 }
@@ -206,6 +228,21 @@ describe("App", () => {
 	it("routes server detail paths through the app router", async () => {
 		renderApp("/server/42");
 
+		expect(
+			await screen.findByText("sakura-server-detail-page"),
+		).toBeInTheDocument();
+	});
+
+	it("renders and navigates from the command overlay inside the app router", async () => {
+		renderApp();
+
+		fireEvent.click(await screen.findByRole("button", { name: "open-search" }));
+		const command = await screen.findByRole("button", {
+			name: "command-overlay",
+		});
+		expect(command).toBeInTheDocument();
+
+		fireEvent.click(command);
 		expect(
 			await screen.findByText("sakura-server-detail-page"),
 		).toBeInTheDocument();

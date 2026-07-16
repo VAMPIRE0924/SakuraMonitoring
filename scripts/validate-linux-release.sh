@@ -24,6 +24,9 @@ command -v file >/dev/null
 command -v readelf >/dev/null
 command -v strings >/dev/null
 command -v curl >/dev/null
+command -v realpath >/dev/null
+
+binary=$(realpath "$binary")
 
 if [[ ! -x $binary ]]; then
   chmod +x "$binary"
@@ -63,6 +66,14 @@ if strings "$binary" | grep -Fq 'go-sqlite3 requires cgo'; then
   exit 1
 fi
 echo "CGO stub string: absent"
+
+for forbidden_theme in 'Nazhua' 'Aobobo' 'Nezha-ASCII'; do
+  if strings "$binary" | grep -Fq "$forbidden_theme"; then
+    echo "Release contains unsupported frontend theme: $forbidden_theme" >&2
+    exit 1
+  fi
+done
+echo "Embedded theme boundary: Official and Sakura only"
 
 (
   cd "$backend_root"

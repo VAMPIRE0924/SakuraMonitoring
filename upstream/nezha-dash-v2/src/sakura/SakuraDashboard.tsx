@@ -18,6 +18,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { SakuraPageLoader } from "@/components/loading/SakuraPageLoader";
+import { SakuraPanelLoader } from "@/components/loading/SakuraPanelLoader";
 import { SORT_TYPES, type SortType } from "@/context/sort-context";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
 import { useRestoreMainPageScroll } from "@/hooks/use-restore-main-page-scroll";
@@ -46,8 +47,10 @@ import {
 	getOverviewTotals,
 } from "@/sakura/sakura-data";
 
-const SakuraMapPanel = lazy(() => import("@/sakura/SakuraMapPanel"));
-const SakuraServicePanel = lazy(() => import("@/sakura/SakuraServicePanel"));
+const loadSakuraMapPanel = () => import("@/sakura/SakuraMapPanel");
+const loadSakuraServicePanel = () => import("@/sakura/SakuraServicePanel");
+const SakuraMapPanel = lazy(loadSakuraMapPanel);
+const SakuraServicePanel = lazy(loadSakuraServicePanel);
 const SakuraServerDetailDialog = lazy(
 	() => import("@/sakura/SakuraServerDetailDialog"),
 );
@@ -438,6 +441,11 @@ export default function SakuraDashboard() {
 		false,
 		SHOW_SERVICES_FALLBACK_KEYS,
 	);
+	useEffect(() => {
+		if (showMap && showServices) {
+			void loadSakuraServicePanel().catch(() => undefined);
+		}
+	}, [showMap, showServices]);
 	const { data: groupData } = useQuery({
 		queryKey: ["server-group"],
 		queryFn: ({ signal }) => fetchServerGroup(signal),
@@ -560,6 +568,16 @@ export default function SakuraDashboard() {
 		setViewMode(mode);
 		setStoredItem("localStorage", "inline", mode === "list" ? "1" : "0");
 	};
+	const loadingPanelResources: Array<"globe" | "service"> = [
+		...(showMap ? (["globe"] as const) : []),
+		...(showServices ? (["service"] as const) : []),
+	];
+	const loadingPanelLabel =
+		showMap && showServices
+			? t("info.loadingGlobeAndServiceResources")
+			: showMap
+				? t("info.loadingGlobeResources")
+				: t("info.loadingServiceResources");
 	return (
 		<div className="sakura-dashboard">
 			<SakuraHeaderTimer />
@@ -585,18 +603,23 @@ export default function SakuraDashboard() {
 					onViewModeChange={handleViewModeChange}
 				/>
 			)}
-			{hasServers && showMap && (
-				<Suspense fallback={null}>
-					<SakuraMapPanel
-						now={lastData.now}
-						onOpenServer={setSelectedServerId}
-						serverList={lastData.servers}
-					/>
-				</Suspense>
-			)}
-			{hasServers && showServices && (
-				<Suspense fallback={null}>
-					<SakuraServicePanel serviceData={serviceData} />
+			{hasServers && (showMap || showServices) && (
+				<Suspense
+					fallback={
+						<SakuraPanelLoader
+							label={loadingPanelLabel}
+							resources={loadingPanelResources}
+						/>
+					}
+				>
+					{showMap && (
+						<SakuraMapPanel
+							now={lastData.now}
+							onOpenServer={setSelectedServerId}
+							serverList={lastData.servers}
+						/>
+					)}
+					{showServices && <SakuraServicePanel serviceData={serviceData} />}
 				</Suspense>
 			)}
 			{!hasServers || filteredServers.length === 0 ? (

@@ -12,7 +12,7 @@
 		"toggleTheme": "切換主題",
 		"hideBackground": "隱藏背景",
 		"restoreBackground": "恢復背景",
-		"toggleMap": "切換地圖面板",
+		"toggleMap": "切換地球面板",
 		"toggleServices": "切換服務監控面板",
 		"toggleServerView": "切換主機檢視",
 		"serverGroups": "主機分組"
@@ -35,6 +35,9 @@
 	"info": {
 		"pageLoading": "正在載入資源...",
 		"loadingNodes": "正在載入節點...",
+		"loadingGlobeResources": "正在載入地球資源...",
+		"loadingServiceResources": "正在載入服務資源...",
+		"loadingGlobeAndServiceResources": "正在載入地球和服務資源...",
 		"websocketConnecting": "WebSocket 連線中",
 		"websocketConnected": "WebSocket 連線成功",
 		"websocketDisconnected": "WebSocket 連線中斷",

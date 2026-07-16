@@ -1195,7 +1195,7 @@ describe("Sakura independent theme", () => {
 		expect(screen.getByText("edge-online")).toBeInTheDocument();
 		expect(screen.queryByText("edge-offline")).not.toBeInTheDocument();
 
-		fireEvent.click(screen.getByLabelText("Toggle map panel"));
+		fireEvent.click(screen.getByLabelText("Toggle globe panel"));
 		expect(await screen.findByTestId("sakura-global-map")).toHaveTextContent(
 			"edge-online,edge-offline",
 		);
@@ -1835,7 +1835,7 @@ describe("Sakura independent theme", () => {
 		expect(await screen.findByText("HTTPS")).toBeInTheDocument();
 		expect(container.querySelector(".sakura-server-list")).toBeInTheDocument();
 
-		fireEvent.click(screen.getByLabelText("Toggle map panel"));
+		fireEvent.click(screen.getByLabelText("Toggle globe panel"));
 		fireEvent.click(screen.getByLabelText("Toggle service panel"));
 		fireEvent.click(screen.getByLabelText("Toggle server view"));
 
@@ -1872,7 +1872,7 @@ describe("Sakura independent theme", () => {
 		renderSakura(<SakuraDashboard />);
 
 		await waitFor(() => expect(apiMocks.fetchService).toHaveBeenCalled());
-		expect(screen.getByLabelText("Toggle map panel")).toBeInTheDocument();
+		expect(screen.getByLabelText("Toggle globe panel")).toBeInTheDocument();
 		expect(screen.getByLabelText("Toggle server view")).toBeInTheDocument();
 		expect(
 			screen.queryByLabelText("Toggle service panel"),

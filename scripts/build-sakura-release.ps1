@@ -58,6 +58,7 @@ if ($Version -notmatch '^v?\d+\.\d+\.\d+$') {
 }
 
 & (Join-Path $PSScriptRoot 'verify-environment.ps1')
+& (Join-Path $PSScriptRoot 'enforce-theme-boundary.ps1') -WorkspaceRoot $workspaceRoot -Prune -RequireSakura
 & (Join-Path $PSScriptRoot 'prepare-official-frontend-dists.ps1') -WorkspaceRoot $workspaceRoot -Force
 & (Join-Path $PSScriptRoot 'build-sakura-user-dist.ps1') -WorkspaceRoot $workspaceRoot -SkipInstall:$SkipInstall
 & (Join-Path $PSScriptRoot 'check-sakura-template.ps1') -WorkspaceRoot $workspaceRoot

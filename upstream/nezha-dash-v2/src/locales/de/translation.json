@@ -12,7 +12,7 @@
 		"toggleTheme": "Design ändern",
 		"hideBackground": "Hintergrund ausblenden",
 		"restoreBackground": "Hintergrund wiederherstellen",
-		"toggleMap": "Kartenbereich umschalten",
+		"toggleMap": "Globusbereich umschalten",
 		"toggleServices": "Dienstbereich umschalten",
 		"toggleServerView": "Serveransicht umschalten",
 		"serverGroups": "Servergruppen"
@@ -122,6 +122,9 @@
 	"info": {
 		"pageLoading": "Ressourcen werden geladen...",
 		"loadingNodes": "Knoten werden geladen...",
+		"loadingGlobeResources": "Globusressourcen werden geladen...",
+		"loadingServiceResources": "Dienstressourcen werden geladen...",
+		"loadingGlobeAndServiceResources": "Globus- und Dienstressourcen werden geladen...",
 		"websocketConnecting": "WebSocket verbindet",
 		"websocketConnected": "WebSocket verbunden",
 		"websocketDisconnected": "WebSocket getrennt",

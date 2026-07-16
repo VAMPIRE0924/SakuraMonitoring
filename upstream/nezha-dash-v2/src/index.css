@@ -2602,6 +2602,51 @@
 		line-height: 19.5px;
 	}
 
+	.sakura-panel-loader {
+		display: grid;
+		width: 100%;
+		align-content: center;
+		justify-items: center;
+		gap: 10px;
+		min-height: 88px;
+		margin-top: 20px;
+		padding: 14px 0 18px;
+		color: var(--nz-muted);
+	}
+
+	.sakura-panel-loader-label {
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 20px;
+	}
+
+	.sakura-panel-loader-progress {
+		display: grid;
+		width: min(380px, calc(100% - 32px));
+		grid-template-columns: minmax(0, 1fr) 42px;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.sakura-panel-loader-track {
+		height: 6px;
+		overflow: hidden;
+		border-radius: 999px;
+		background: rgb(148 163 184 / 0.22);
+	}
+
+	.sakura-panel-loader-track > span {
+		display: block;
+		height: 100%;
+		background: linear-gradient(90deg, #2dd4bf, #38bdf8);
+	}
+
+	.sakura-panel-loader-percent {
+		font-size: 12px;
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+	}
+
 	html:not(.dark) .sakura-map-panel {
 		background: transparent;
 	}

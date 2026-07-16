@@ -12,7 +12,7 @@
 		"toggleTheme": "Сменить тему",
 		"hideBackground": "Скрыть фон",
 		"restoreBackground": "Восстановить фон",
-		"toggleMap": "Переключить карту",
+		"toggleMap": "Переключить глобус",
 		"toggleServices": "Переключить мониторинг сервисов",
 		"toggleServerView": "Переключить вид серверов",
 		"serverGroups": "Группы серверов"
@@ -83,6 +83,9 @@
 	"info": {
 		"pageLoading": "Загрузка ресурсов...",
 		"loadingNodes": "Загрузка узлов...",
+		"loadingGlobeResources": "Загрузка ресурсов глобуса...",
+		"loadingServiceResources": "Загрузка ресурсов сервисов...",
+		"loadingGlobeAndServiceResources": "Загрузка ресурсов глобуса и сервисов...",
 		"websocketConnecting": "WebSocket подключение",
 		"websocketConnected": "WebSocket подключен",
 		"websocketDisconnected": "WebSocket отключен",

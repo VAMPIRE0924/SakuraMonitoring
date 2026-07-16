@@ -12,7 +12,7 @@
 		"toggleTheme": "Cambiar tema",
 		"hideBackground": "Ocultar fondo",
 		"restoreBackground": "Restaurar fondo",
-		"toggleMap": "Alternar panel del mapa",
+		"toggleMap": "Alternar panel del globo",
 		"toggleServices": "Alternar panel de servicios",
 		"toggleServerView": "Cambiar vista de servidores",
 		"serverGroups": "Grupos de servidores"
@@ -175,6 +175,9 @@
 	"info": {
 		"pageLoading": "Cargando recursos...",
 		"loadingNodes": "Cargando nodos...",
+		"loadingGlobeResources": "Cargando recursos del globo...",
+		"loadingServiceResources": "Cargando recursos de servicios...",
+		"loadingGlobeAndServiceResources": "Cargando recursos del globo y los servicios...",
 		"websocketConnecting": "Conexión WebSocket",
 		"websocketDisconnected": "WebSocket desconectado",
 		"websocketConnected": "WebSocket conectado",

@@ -18,7 +18,7 @@ vi.mock("react-i18next", () => ({
 			"controls.restoreBackground": "Restore background",
 			"controls.search": "Search",
 			"controls.serverGroups": "Server groups",
-			"controls.toggleMap": "Toggle map panel",
+			"controls.toggleMap": "Toggle globe panel",
 			"controls.toggleServerView": "Toggle server view",
 			"controls.toggleServices": "Toggle service panel",
 			"controls.toggleTheme": "Toggle theme",

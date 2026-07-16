@@ -30,6 +30,7 @@ function Get-RelativeAssetPath([string]$Url) {
 }
 
 $workspaceFull = (Resolve-Path -LiteralPath $WorkspaceRoot).Path
+& (Join-Path $PSScriptRoot 'enforce-theme-boundary.ps1') -WorkspaceRoot $workspaceFull -RequireSakura
 $backendRoot = [System.IO.Path]::Combine($workspaceFull, 'upstream', 'nezha')
 $templateRegistry = [System.IO.Path]::Combine($backendRoot, 'service', 'singleton', 'frontend-templates.yaml')
 $dashboardMain = [System.IO.Path]::Combine($backendRoot, 'cmd', 'dashboard', 'main.go')

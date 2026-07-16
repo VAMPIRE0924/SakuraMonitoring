@@ -83,6 +83,10 @@ foreach ($source in $sources) {
     $commits = @(Invoke-Git @('-C', $target, 'log', '--oneline', "$($config.commit)..$latestCommit"))
     [System.IO.File]::WriteAllLines((Join-Path $target 'upstream-commits.txt'), $commits)
 
+    if ($name -eq 'backend') {
+        & (Join-Path $PSScriptRoot 'enforce-theme-boundary.ps1') -BackendRoot $target -Prune
+    }
+
     Write-Output "Prepared isolated review source: $target"
     Write-Output "Change patch: $patchPath"
 }

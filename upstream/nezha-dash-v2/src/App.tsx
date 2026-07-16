@@ -5,6 +5,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import { SakuraPageLoader } from "./components/loading/SakuraPageLoader";
+import { useCommand } from "./hooks/use-command";
 import { useSakuraRuntimeConfig } from "./hooks/use-sakura-config";
 import { useSakuraPointerInput } from "./hooks/use-sakura-pointer-input";
 import { useTheme } from "./hooks/use-theme";
@@ -21,9 +22,25 @@ import { SakuraRefreshToast, SakuraShell } from "./sakura/SakuraShell";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const SakuraServerDetail = lazy(() => import("./sakura/SakuraServerDetail"));
+const DashCommand = lazy(() =>
+	import("./components/DashCommand").then((module) => ({
+		default: module.DashCommand,
+	})),
+);
 
 function RouteFallback() {
 	return <SakuraPageLoader />;
+}
+
+function CommandOverlay() {
+	const { isOpen } = useCommand();
+	if (!isOpen) return null;
+
+	return (
+		<Suspense fallback={null}>
+			<DashCommand />
+		</Suspense>
+	);
 }
 
 function MainApp() {
@@ -145,6 +162,7 @@ function MainApp() {
 function App() {
 	return (
 		<Router basename={import.meta.env.BASE_URL}>
+			<CommandOverlay />
 			<MainApp />
 		</Router>
 	);

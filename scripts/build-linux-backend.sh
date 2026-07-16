@@ -52,9 +52,17 @@ cd "$backend_root"
 geoip_path="$backend_root/pkg/geoip/geoip.db"
 geoip_backup=$(mktemp)
 geoip_work=$(mktemp -d)
-cp "$geoip_path" "$geoip_backup"
+geoip_existed=false
+if [[ -f "$geoip_path" ]]; then
+  cp "$geoip_path" "$geoip_backup"
+  geoip_existed=true
+fi
 cleanup() {
-  cp "$geoip_backup" "$geoip_path"
+  if [[ $geoip_existed == true ]]; then
+    cp "$geoip_backup" "$geoip_path"
+  else
+    rm -f "$geoip_path"
+  fi
   rm -f "$geoip_backup"
   rm -rf "$geoip_work"
 }

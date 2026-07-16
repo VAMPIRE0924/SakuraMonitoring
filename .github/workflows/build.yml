@@ -1,0 +1,107 @@
+name: Build Sakura dashboard
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.5
+          cache-dependency-path: upstream/nezha/go.sum
+
+      - name: Install official Linux release toolchain
+        run: sudo apt-get update && sudo apt-get install --yes binutils gcc unzip zip
+
+      - name: Install frontend dependencies
+        working-directory: upstream/nezha-dash-v2
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify frontend
+        working-directory: upstream/nezha-dash-v2
+        run: pnpm run check && pnpm run typecheck && pnpm run test:coverage
+
+      - name: Prepare embedded templates
+        shell: pwsh
+        run: |
+          ./scripts/prepare-official-frontend-dists.ps1
+          ./scripts/build-sakura-user-dist.ps1 -SkipInstall
+          ./scripts/check-sakura-template.ps1
+
+      - name: Build Linux dashboard
+        shell: bash
+        env:
+          IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
+        run: |
+          version=$(node -p "require('./upstreams.lock.json').backend.version")
+          bash ./scripts/build-linux-backend.sh "$GITHUB_WORKSPACE" "$version" \
+            "$GITHUB_WORKSPACE/dist/dashboard-linux-${{ matrix.arch }}" "${{ matrix.arch }}"
+          bash ./scripts/validate-linux-release.sh \
+            "$GITHUB_WORKSPACE/dist/dashboard-linux-${{ matrix.arch }}" "$version" "${{ matrix.arch }}"
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-linux-${{ matrix.arch }}
+          path: |
+            dist/dashboard-linux-${{ matrix.arch }}
+            dist/dashboard-linux-${{ matrix.arch }}.sha256
+            dist/dashboard-linux-${{ matrix.arch }}.zip
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: linux
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download validated Linux packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: dashboard-linux-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/dashboard-linux-amd64.zip
+            dist/dashboard-linux-amd64.sha256
+            dist/dashboard-linux-arm64.zip
+            dist/dashboard-linux-arm64.sha256
+          fail_on_unmatched_files: true
+          generate_release_notes: true

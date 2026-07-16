@@ -1,0 +1,24 @@
+Sakura Monitoring
+
+This repository contains a maintained Sakura frontend theme integrated with
+source from the Nezha dashboard and nezha-dash-v2 projects.
+
+Nezha dashboard:
+  https://github.com/nezhahq/nezha
+
+nezha-dash-v2:
+  https://github.com/hamster1963/nezha-dash-v2
+
+The upstream source directories retain their original Apache License 2.0
+license files. Upstream commit pins are recorded in upstreams.lock.json.
+
+ISO TopoJSON:
+  https://github.com/rembish/iso-topojson
+  Version 1.4.0, licensed under CC BY 4.0. The country and territory
+  geometries are derived from the public-domain Natural Earth 10m dataset.
+
+Komari loading animation reference:
+  https://komari.mikus.ink/
+  https://komari.mikus.ink/assets/img/loli.gif
+  The default loading animation is a local copy of the referenced asset and
+  can be replaced or disabled through window.CustomLoadingIllustration.

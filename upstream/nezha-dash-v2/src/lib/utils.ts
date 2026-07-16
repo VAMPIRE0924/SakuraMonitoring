@@ -1,0 +1,296 @@
+import { type ClassValue, clsx } from "clsx";
+import dayjs from "dayjs";
+import { twMerge } from "tailwind-merge";
+import { isRecord } from "@/lib/runtime-value";
+import type { NezhaServer } from "@/types/nezha-api";
+
+export function cn(...inputs: ClassValue[]) {
+	return twMerge(clsx(inputs));
+}
+
+export function formatNezhaInfo(now: number, serverInfo: NezhaServer) {
+	const lastActiveTime = serverInfo.last_active.startsWith("000")
+		? 0
+		: parseISOTimestamp(serverInfo.last_active);
+	return {
+		...serverInfo,
+		cpu: serverInfo.state.cpu || 0,
+		gpu: serverInfo.state.gpu || [],
+		process: serverInfo.state.process_count || 0,
+		up: serverInfo.state.net_out_speed / 1024 / 1024 || 0,
+		down: serverInfo.state.net_in_speed / 1024 / 1024 || 0,
+		last_active_time_string: lastActiveTime
+			? dayjs(lastActiveTime).format("YYYY-MM-DD HH:mm:ss")
+			: "",
+		online: now - lastActiveTime <= 30000,
+		uptime: serverInfo.state.uptime || 0,
+		version: serverInfo.host.version || null,
+		tcp: serverInfo.state.tcp_conn_count || 0,
+		udp: serverInfo.state.udp_conn_count || 0,
+		mem: (serverInfo.state.mem_used / serverInfo.host.mem_total) * 100 || 0,
+		swap: (serverInfo.state.swap_used / serverInfo.host.swap_total) * 100 || 0,
+		disk: (serverInfo.state.disk_used / serverInfo.host.disk_total) * 100 || 0,
+		stg: (serverInfo.state.disk_used / serverInfo.host.disk_total) * 100 || 0,
+		country_code: serverInfo.country_code,
+		platform: serverInfo.host.platform || "",
+		net_out_transfer: serverInfo.state.net_out_transfer || 0,
+		net_in_transfer: serverInfo.state.net_in_transfer || 0,
+		arch: serverInfo.host.arch || "",
+		mem_total: serverInfo.host.mem_total || 0,
+		swap_total: serverInfo.host.swap_total || 0,
+		disk_total: serverInfo.host.disk_total || 0,
+		boot_time: serverInfo.host.boot_time || 0,
+		boot_time_string: serverInfo.host.boot_time
+			? dayjs(serverInfo.host.boot_time * 1000).format("YYYY-MM-DD HH:mm:ss")
+			: "",
+		platform_version: serverInfo.host.platform_version || "",
+		cpu_info: serverInfo.host.cpu || [],
+		gpu_info: serverInfo.host.gpu || [],
+		load_1: serverInfo.state.load_1?.toFixed(2) || 0.0,
+		load_5: serverInfo.state.load_5?.toFixed(2) || 0.0,
+		load_15: serverInfo.state.load_15?.toFixed(2) || 0.0,
+		public_note: serverInfo.public_note || "",
+	};
+}
+
+export function getDaysBetweenDatesWithAutoRenewal({
+	autoRenewal,
+	cycle,
+	startDate,
+	endDate,
+}: BillingData): {
+	days: number;
+	cycleLabel: string;
+	remainingPercentage: number;
+} {
+	let months = 1;
+	// 套餐资费
+	let cycleLabel = cycle;
+
+	switch (cycle.toLowerCase()) {
+		case "月":
+		case "m":
+		case "mo":
+		case "month":
+		case "monthly":
+			cycleLabel = "月";
+			months = 1;
+			break;
+		case "年":
+		case "y":
+		case "yr":
+		case "year":
+		case "annual":
+			cycleLabel = "年";
+			months = 12;
+			break;
+		case "季":
+		case "q":
+		case "qr":
+		case "quarterly":
+			cycleLabel = "季";
+			months = 3;
+			break;
+		case "半":
+		case "半年":
+		case "h":
+		case "half":
+		case "semi-annually":
+			cycleLabel = "半年";
+			months = 6;
+			break;
+		default:
+			cycleLabel = cycle;
+			break;
+	}
+
+	const nowTime = Date.now();
+	const end = dayjs(endDate);
+	if (!end.isValid()) {
+		throw new Error("参数无效：请检查起始日期和结束日期。");
+	}
+	if (autoRenewal !== "1" && !dayjs(startDate).isValid()) {
+		throw new Error("参数无效：请检查起始日期和结束日期。");
+	}
+	const endTime = end.valueOf();
+	const nowIso = new Date(nowTime).toISOString();
+	const days = getDaysBetweenDates(endDate, nowIso);
+	const remainingRatio = (totalDays: number) =>
+		totalDays > 0 ? Math.min(1, days / totalDays) : 0;
+
+	if (autoRenewal !== "1") {
+		const totalDays = dayjs(endDate).diff(startDate, "day");
+		return {
+			days,
+			cycleLabel: cycleLabel,
+			remainingPercentage: remainingRatio(totalDays),
+		};
+	}
+
+	if (nowTime < endTime) {
+		return {
+			days,
+			cycleLabel: cycleLabel,
+			remainingPercentage: remainingRatio(30 * months),
+		};
+	}
+
+	const nextTime = getNextCycleTime(endTime, months, nowTime);
+	const diff = dayjs(nextTime).diff(dayjs(), "day") + 1;
+	const remainingPercentage =
+		diff / (30 * months) > 1 ? 1 : diff / (30 * months);
+
+	return {
+		days: diff,
+		cycleLabel: cycleLabel,
+		remainingPercentage: remainingPercentage,
+	};
+}
+
+// Thanks to hi2shark for the code
+// https://github.com/hi2shark/nazhua/blob/main/src/utils/date.js#L86
+export function getNextCycleTime(
+	startDate: number,
+	months: number,
+	specifiedDate: number,
+): number {
+	const start = dayjs(startDate);
+	const checkDate = dayjs(specifiedDate);
+
+	if (!start.isValid() || months <= 0) {
+		throw new Error("参数无效：请检查起始日期、周期月份数和指定日期。");
+	}
+
+	let nextDate = start;
+
+	// 循环增加周期直到大于当前日期
+	let whileStatus = true;
+	while (whileStatus) {
+		nextDate = nextDate.add(months, "month");
+		whileStatus = nextDate.valueOf() <= checkDate.valueOf();
+	}
+
+	return nextDate.valueOf(); // 返回时间毫秒数
+}
+
+export function getDaysBetweenDates(date1: string, date2: string): number {
+	const oneDay = 24 * 60 * 60 * 1000; // 一天的毫秒数
+	const firstDate = new Date(date1);
+	const secondDate = new Date(date2);
+	if (
+		!Number.isFinite(firstDate.getTime()) ||
+		!Number.isFinite(secondDate.getTime())
+	) {
+		throw new Error("参数无效：请检查起始日期和结束日期。");
+	}
+
+	// 计算两个日期之间的天数差异
+	return Math.round((firstDate.getTime() - secondDate.getTime()) / oneDay);
+}
+
+function parseISOTimestamp(isoString: string): number {
+	return new Date(isoString).getTime();
+}
+
+export function formatRelativeTime(timestamp: number): string {
+	const now = Date.now();
+	const diff = now - timestamp;
+	const hours = Math.floor(diff / (1000 * 60 * 60));
+	const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+	const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+	if (hours > 24) {
+		const days = Math.floor(hours / 24);
+		return `${days}d`;
+	} else if (hours > 0) {
+		return `${hours}h`;
+	} else if (minutes > 0) {
+		return `${minutes}m`;
+	} else if (seconds >= 0) {
+		return `${seconds}s`;
+	}
+	return "0s";
+}
+
+export function formatTime(timestamp: number): string {
+	const date = new Date(timestamp);
+	const year = date.getFullYear();
+	const month = date.getMonth() + 1;
+	const day = date.getDate();
+	const hours = date.getHours().toString().padStart(2, "0");
+	const minutes = date.getMinutes().toString().padStart(2, "0");
+	const seconds = date.getSeconds().toString().padStart(2, "0");
+	return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+interface BillingData {
+	startDate: string;
+	endDate: string;
+	autoRenewal: string;
+	cycle: string;
+	amount: string;
+}
+
+interface PlanData {
+	bandwidth: string;
+	trafficVol: string;
+	trafficType: string;
+	IPv4: string;
+	IPv6: string;
+	networkRoute: string;
+	extra: string;
+}
+
+export interface PublicNoteData {
+	billingDataMod?: BillingData;
+	planDataMod?: PlanData;
+}
+
+function readNoteString(value: unknown) {
+	return typeof value === "string" ? value : "";
+}
+
+function normalizeBillingData(value: unknown): BillingData | undefined {
+	if (!isRecord(value)) return undefined;
+
+	return {
+		startDate: readNoteString(value.startDate),
+		endDate: readNoteString(value.endDate),
+		autoRenewal: readNoteString(value.autoRenewal),
+		cycle: readNoteString(value.cycle),
+		amount: readNoteString(value.amount),
+	};
+}
+
+function normalizePlanData(value: unknown): PlanData | undefined {
+	if (!isRecord(value)) return undefined;
+
+	return {
+		bandwidth: readNoteString(value.bandwidth),
+		trafficVol: readNoteString(value.trafficVol),
+		trafficType: readNoteString(value.trafficType),
+		IPv4: readNoteString(value.IPv4),
+		IPv6: readNoteString(value.IPv6),
+		networkRoute: readNoteString(value.networkRoute),
+		extra: readNoteString(value.extra),
+	};
+}
+
+export function parsePublicNote(publicNote: string): PublicNoteData | null {
+	try {
+		if (!publicNote) return null;
+		const data: unknown = JSON.parse(publicNote);
+		if (!isRecord(data)) return null;
+
+		const billingDataMod = normalizeBillingData(data.billingDataMod);
+		const planDataMod = normalizePlanData(data.planDataMod);
+		if (!billingDataMod && !planDataMod) return null;
+
+		return {
+			...(billingDataMod ? { billingDataMod } : {}),
+			...(planDataMod ? { planDataMod } : {}),
+		};
+	} catch {
+		return null;
+	}
+}

@@ -1,0 +1,219 @@
+{
+	"common": {
+		"close": "Закрыть",
+		"serverDetail": "Сведения о сервере",
+		"serverMonitoringDetail": "Данные мониторинга сервера",
+		"serverDetailViews": "Разделы сведений о сервере"
+	},
+	"controls": {
+		"customLinks": "Пользовательские ссылки",
+		"search": "Поиск",
+		"changeLanguage": "Сменить язык",
+		"toggleTheme": "Сменить тему",
+		"hideBackground": "Скрыть фон",
+		"restoreBackground": "Восстановить фон",
+		"toggleMap": "Переключить карту",
+		"toggleServices": "Переключить мониторинг сервисов",
+		"toggleServerView": "Переключить вид серверов",
+		"serverGroups": "Группы серверов"
+	},
+	"map": {
+		"LocalTime": "Местное время",
+		"Servers": "сервера",
+		"Distributions": "Серверы распределены в",
+		"Regions": "Регионы",
+		"ServerCount": "Серверов: {{count}}",
+		"OfflineServers": "Не в сети: {{count}}",
+		"OfflineSummary": "(не в сети: {{count}})",
+		"ResetView": "Сбросить вид"
+	},
+	"serverDetailChart": {
+		"disk": "Диск",
+		"download": "Скачивание",
+		"swap": "Swap",
+		"upload": "Загрузка",
+		"mem": "Mem",
+		"process": "Процесс",
+		"realtime": "Сейчас",
+		"period1d": "1 День",
+		"period7d": "7 Дней",
+		"period30d": "30 Дней",
+		"tsdbRequired": "Включите TSDB, чтобы использовать исторические данные",
+		"loginRequired": "Войдите, чтобы просмотреть"
+	},
+	"serverCard": {
+		"system": "Система",
+		"hours": "Часов",
+		"uptime": "Аптайм",
+		"download": "Скачать",
+		"mem": "MEM",
+		"stg": "STG",
+		"upload": "Загрузка",
+		"totalUpload": "Загружено",
+		"totalDownload": "Скачано",
+		"days": "Дней"
+	},
+	"tabSwitch": {
+		"Detail": "Детали",
+		"Network": "Сеть"
+	},
+	"whereTheTimeIs": "Где время",
+	"greeting": {
+		"morning": "Доброе утро!",
+		"noon": "Добрый день!",
+		"afternoon": "Добрый день!",
+		"evening": "Добрый вечер!"
+	},
+	"theme": {
+		"dark": "Темная тема",
+		"light": "Светлая тема",
+		"system": "Как в Системе"
+	},
+	"login": "Логин",
+	"language": {
+		"zh-TW": "Традиционный китайский",
+		"zh-CN": "Упрощенный китайский",
+		"en-US": "Английский",
+		"de-DE": "Немецкий",
+		"ta-IN": "Тамильский",
+		"ru-RU": "Русский",
+		"es-ES": "Испанский"
+	},
+	"overview": "Обзор",
+	"info": {
+		"pageLoading": "Загрузка ресурсов...",
+		"loadingNodes": "Загрузка узлов...",
+		"websocketConnecting": "WebSocket подключение",
+		"websocketConnected": "WebSocket подключен",
+		"websocketDisconnected": "WebSocket отключен",
+		"processing": "Обработка...",
+		"noServers": "Нет доступных серверов",
+		"noMatchingServers": "Нет серверов, соответствующих текущим фильтрам"
+	},
+	"cycleTransfer": {
+		"nextUpdate": "следующее обновление",
+		"used": "использовано",
+		"period": "цикл",
+		"total": "всего"
+	},
+	"dashboard": "Панель",
+	"online": "Онлайн",
+	"connecting": "Подключение",
+	"refreshing": "Обновление",
+	"serverOverview": {
+		"totalServers": "Всего Серверов",
+		"totalBandwidth": "Общая пропускная способность",
+		"network": "Сеть",
+		"speed": "Скорость",
+		"trafficRate": "Скорость сети",
+		"trafficTotal": "Трафик",
+		"onlineServers": "Серверы в сети",
+		"offlineServers": "Серверы не в сети",
+		"totalUploadCard": "Всего вверх",
+		"totalDownloadCard": "Всего вниз"
+	},
+	"serviceTracker": {
+		"noService": "Нет данных о сервисе",
+		"averageDelay": "Средняя задержка",
+		"delay": "Задержка",
+		"daysAgo": "Дней назад",
+		"today": "Сегодня",
+		"uptime": "Аптайм",
+		"loading": "Загрузка..."
+	},
+	"serverDetail": {
+		"status": "Статус",
+		"days": "Дней",
+		"hours": "Часов",
+		"offline": "Оффлайн",
+		"uptime": "Аптайм",
+		"arch": "Arch",
+		"mem": "Mem",
+		"disk": "Диск",
+		"system": "Система",
+		"lastActive": "Время последней активности",
+		"download": "Скачивание",
+		"unknown": "Неизвестно",
+		"version": "Версия",
+		"online": "В сети",
+		"region": "Регион",
+		"city": "Город",
+		"country": "Страна",
+		"bootTime": "Время загрузки",
+		"upload": "Загрузка",
+		"temperature": "Температура",
+		"detail": "Детали"
+	},
+	"monitor": {
+		"noData": "Нет данных мониторинга сервера, пожалуйста, сначала добавьте монитор службы",
+		"avgDelay": "Задержка",
+		"monitorCount": "Сервисы",
+		"packetLoss": "Потеря пакетов",
+		"clearSelections": "Очистить",
+		"peakCut": "Peak cut",
+		"loginRequired": "Войдите, чтобы просмотреть",
+		"period1d": "1 день",
+		"period7d": "7 дней",
+		"period30d": "30 дней"
+	},
+	"pwa": {
+		"newContent": "Доступен новый контент",
+		"reload": "Обновить",
+		"offlineReady": "Приложение готово работать в офлайн-режиме"
+	},
+	"billingInfo": {
+		"remaining": "Осталось",
+		"error": "ошибка",
+		"indefinite": "Неопределено",
+		"expired": "Истекло",
+		"price": "Цена",
+		"free": "Бесплатно",
+		"days": "дней",
+		"usage-baseed": "Оплата по использованию"
+	},
+	"TypeCommand": "Введите команду или выполните поиск...",
+	"Servers": "Серверы",
+	"ToggleLightMode": "Переключить на светлую тему",
+	"Home": "Главная",
+	"offline": "Оффлайн",
+	"error": {
+		"pageNotFound": "Страница не найдена",
+		"somethingWentWrong": "Что-то пошло не так",
+		"backToHome": "Вернуться на главную",
+		"backendUnavailableTitle": "API сервера недоступен",
+		"backendUnavailableDescription": "Страница доступна, но данные мониторинга временно не загружаются."
+	},
+	"ToggleDarkMode": "Переключить на темную тему",
+	"Shortcuts": "Горячие клавиши",
+	"ToggleSystemMode": "Использовать системную тему",
+	"footer": {
+		"themeBy": "Тема от "
+	},
+	"NoResults": "Ничего не найдено.",
+	"nezha": "Nezha Monitoring",
+	"sort": {
+		"label": "Сорт.",
+		"directionDisabled": "Направление сортировки недоступно",
+		"ascending": "По возрастанию",
+		"descending": "По убыванию",
+		"types": {
+			"default": "По умолчанию",
+			"name": "Имя",
+			"uptime": "Аптайм",
+			"system": "Система",
+			"cpu": "CPU",
+			"mem": "Память",
+			"disk": "Диск",
+			"up": "Загрузка",
+			"down": "Скачивание",
+			"up_total": "Загружено",
+			"down_total": "Скачано",
+			"traffic": "Общий трафик",
+			"rate": "Общая скорость"
+		},
+		"activeTypes": {
+			"up_total": "Всего вверх",
+			"down_total": "Всего вниз"
+		}
+	}
+}

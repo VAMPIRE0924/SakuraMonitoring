@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <style>
+      .sakura-page-loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;min-height:100dvh;padding:24px;color:#423440;background:rgb(248 246 249/.96);backdrop-filter:blur(10px)}
+      .dark .sakura-page-loader{color:rgb(245 240 246/.92);background:rgb(9 9 11/.96)}
+      .sakura-page-loader-content{display:flex;width:min(240px,76vw);align-items:center;flex-direction:column;gap:18px;transform:translateY(-3vh)}
+      .sakura-page-loader-illustration{display:block;width:136px;height:188px;object-fit:contain;filter:drop-shadow(0 12px 22px rgb(85 60 84/.16));animation:sakura-loader-float 1.8s ease-in-out infinite}
+      .dark .sakura-page-loader-illustration{filter:drop-shadow(0 12px 24px rgb(0 0 0/.38))}
+      .sakura-page-loader-progress{display:flex;width:100%;align-items:center;gap:10px}
+      .sakura-page-loader-track{position:relative;flex:1 1 auto;height:4px;overflow:hidden;border-radius:999px;background:rgb(150 128 154/.2)}
+      .dark .sakura-page-loader-track{background:rgb(255 255 255/.12)}
+      .sakura-page-loader-track span{position:absolute;inset:0 auto 0 0;border-radius:inherit;background:linear-gradient(90deg,#f39ab5,#d78fc5);transition:width .24s ease-out}
+      .dark .sakura-page-loader-track span{background:linear-gradient(90deg,#f08eae,#c985c0)}
+      .sakura-page-loader-percent{width:34px;flex:0 0 34px;color:#b76aa2;font-size:12px;font-variant-numeric:tabular-nums;font-weight:600;line-height:16px;text-align:right}
+      .dark .sakura-page-loader-percent{color:#e39acb}
+      .sakura-page-loader-label{font-size:13px;font-weight:500;line-height:20px;letter-spacing:0;opacity:.72}
+      @keyframes sakura-loader-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+      @media (prefers-reduced-motion:reduce){.sakura-page-loader-illustration{animation:none}.sakura-page-loader-track span{transition:none}}
+    </style>
+    <script>
+      ;(() => {
+        const storageKey = "vite-ui-theme"
+        const root = document.documentElement
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+
+        const resolveTheme = (theme) =>
+          theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme
+
+        function updateThemeColor(nextTheme) {
+          const themeColor = nextTheme === "dark" ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)"
+          let meta = document.querySelector('meta[name="theme-color"]')
+
+          if (!meta) {
+            meta = document.createElement("meta")
+            meta.setAttribute("name", "theme-color")
+            document.head.appendChild(meta)
+          }
+
+          meta.setAttribute("content", themeColor)
+        }
+
+        function applyResolvedTheme(resolvedTheme) {
+          root.classList.remove("light", "dark")
+          root.classList.add(resolvedTheme)
+          root.style.colorScheme = resolvedTheme
+          root.style.backgroundColor =
+            resolvedTheme === "dark" ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)"
+          updateThemeColor(resolvedTheme)
+        }
+
+        let theme = "system"
+
+        try {
+          const storedTheme = localStorage.getItem(storageKey)
+          if (storedTheme === "light" || storedTheme === "dark" || storedTheme === "system") {
+            theme = storedTheme
+          }
+        } catch (_e) {
+          theme = "system"
+        }
+
+        applyResolvedTheme(resolveTheme(theme))
+
+        // Add loaded class after React has mounted
+        window.addEventListener("load", () => {
+          const root = document.getElementById("root")
+          if (root) {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                root.classList.add("loaded")
+              })
+            })
+          }
+        })
+      })()
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sakura Monitoring</title>
+    <link
+      rel="icon"
+      type="image/png"
+      data-sakura-favicon="true"
+      href="/sakura-assets/sakura-mark.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/sakura-assets/sakura-loading.gif"
+    />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="hsl(30 15% 8%)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Sakura Monitoring" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  </head>
+  <body>
+    <div id="sakura-initial-loader" class="sakura-page-loader" aria-busy="true" aria-live="polite" role="status">
+      <div class="sakura-page-loader-content">
+        <img class="sakura-page-loader-illustration" src="/sakura-assets/sakura-loading.gif" alt="" aria-hidden="true" fetchpriority="high" />
+        <div class="sakura-page-loader-progress">
+          <div class="sakura-page-loader-track" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="8"><span style="width:8%"></span></div>
+          <output class="sakura-page-loader-percent">8%</output>
+        </div>
+        <strong class="sakura-page-loader-label">Loading...</strong>
+      </div>
+    </div>
+    <script>
+      ;(() => {
+        const language = (navigator.languages?.[0] || navigator.language || "en").toLowerCase()
+        const messages = language.startsWith("zh-tw") || language.startsWith("zh-hk")
+          ? ["正在載入資源...", "載入中"]
+          : language.startsWith("zh")
+            ? ["正在加载资源...", "加载中"]
+            : language.startsWith("de")
+              ? ["Ressourcen werden geladen...", "Laden"]
+              : language.startsWith("es")
+                ? ["Cargando recursos...", "Cargando"]
+                : language.startsWith("ru")
+                  ? ["Загрузка ресурсов...", "Загрузка"]
+                  : ["Loading resources...", "Loading"]
+        const loader = document.getElementById("sakura-initial-loader")
+        loader?.querySelector(".sakura-page-loader-label")?.replaceChildren(messages[0])
+        loader?.querySelector("[role=progressbar]")?.setAttribute("aria-label", messages[1])
+      })()
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

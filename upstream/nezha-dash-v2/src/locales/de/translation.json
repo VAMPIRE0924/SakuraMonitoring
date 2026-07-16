@@ -1,0 +1,221 @@
+{
+	"common": {
+		"close": "Schließen",
+		"serverDetail": "Serverdetails",
+		"serverMonitoringDetail": "Serverüberwachungsdetails",
+		"serverDetailViews": "Serverdetailansichten"
+	},
+	"controls": {
+		"customLinks": "Benutzerdefinierte Links",
+		"search": "Suchen",
+		"changeLanguage": "Sprache ändern",
+		"toggleTheme": "Design ändern",
+		"hideBackground": "Hintergrund ausblenden",
+		"restoreBackground": "Hintergrund wiederherstellen",
+		"toggleMap": "Kartenbereich umschalten",
+		"toggleServices": "Dienstbereich umschalten",
+		"toggleServerView": "Serveransicht umschalten",
+		"serverGroups": "Servergruppen"
+	},
+	"refreshing": "Aktualisieren",
+	"serviceTracker": {
+		"uptime": "Uptime",
+		"averageDelay": "Mittlere Latenz",
+		"delay": "Latenz",
+		"today": "Heute",
+		"noService": "Keine Servicedaten",
+		"daysAgo": "vor Tagen",
+		"loading": "Laden..."
+	},
+	"serverCard": {
+		"uptime": "Uptime",
+		"mem": "MEM",
+		"upload": "Upload",
+		"download": "Download",
+		"system": "System",
+		"stg": "STG",
+		"totalDownload": "Download",
+		"days": "Tage",
+		"hours": "Stunden",
+		"totalUpload": "Upload"
+	},
+	"serverDetail": {
+		"unknown": "Unbekannt",
+		"arch": "Arch",
+		"status": "Status",
+		"online": "Online",
+		"days": "Tage",
+		"hours": "Stunden",
+		"upload": "Upload",
+		"download": "Download",
+		"offline": "Offline",
+		"uptime": "Uptime",
+		"version": "Version",
+		"mem": "Speicher",
+		"disk": "Festplatte",
+		"region": "Region",
+		"city": "Stadt",
+		"country": "Land",
+		"system": "System",
+		"lastActive": "Letzte Aktivität",
+		"temperature": "Temperatur",
+		"bootTime": "Startzeit",
+		"detail": "Details"
+	},
+	"theme": {
+		"system": "Folgen Sie dem System",
+		"light": "Hell",
+		"dark": "Dunkel"
+	},
+	"monitor": {
+		"monitorCount": "Services",
+		"noData": "Kein Server Monitoring Daten, bitte fügen sie zuerst einen Monitor hinzu",
+		"avgDelay": "Latenz",
+		"packetLoss": "Paketverlust",
+		"clearSelections": "Löschen",
+		"peakCut": "Peak cut",
+		"loginRequired": "Bitte anmelden, um die Daten anzuzeigen",
+		"period1d": "1 Tag",
+		"period7d": "7 Tage",
+		"period30d": "30 Tage"
+	},
+	"billingInfo": {
+		"error": "Fehler",
+		"remaining": "Verbleibend",
+		"indefinite": "Unbestimmt",
+		"expired": "Verfallen",
+		"days": "tage",
+		"price": "Preis",
+		"free": "Kostenlos",
+		"usage-baseed": "Verwendungsbasiert"
+	},
+	"overview": "Überblick",
+	"map": {
+		"LocalTime": "Ortszeit",
+		"Regions": "Regionen",
+		"Servers": "server",
+		"Distributions": "Server sind verteilt in",
+		"ServerCount": "{{count}} Server",
+		"OfflineServers": "{{count}} offline",
+		"OfflineSummary": "({{count}} offline)",
+		"ResetView": "Ansicht zurücksetzen"
+	},
+	"pwa": {
+		"reload": "Update",
+		"newContent": "Neue Inhalte verfügbar",
+		"offlineReady": "Anwendung bereit, offline zu verwenden"
+	},
+	"error": {
+		"pageNotFound": "Seite nicht gefunden",
+		"somethingWentWrong": "Etwas ist schiefgelaufen",
+		"backToHome": "Zurück zur Startseite",
+		"backendUnavailableTitle": "Backend-API nicht verfügbar",
+		"backendUnavailableDescription": "Die Seite ist weiterhin verfügbar, aber die Monitoring-Daten können vorübergehend nicht geladen werden."
+	},
+	"whereTheTimeIs": "Wo die Zeit ist",
+	"greeting": {
+		"morning": "Guten Morgen!",
+		"noon": "Guten Mittag!",
+		"afternoon": "Guten Nachmittag!",
+		"evening": "Guten Abend!"
+	},
+	"info": {
+		"pageLoading": "Ressourcen werden geladen...",
+		"loadingNodes": "Knoten werden geladen...",
+		"websocketConnecting": "WebSocket verbindet",
+		"websocketConnected": "WebSocket verbunden",
+		"websocketDisconnected": "WebSocket getrennt",
+		"processing": "Verarbeiten...",
+		"noServers": "Keine Server verfügbar",
+		"noMatchingServers": "Keine Server entsprechen den aktuellen Filtern"
+	},
+	"tabSwitch": {
+		"Network": "Netzwerk",
+		"Detail": "Detail"
+	},
+	"nezha": "Nezha Monitoring",
+	"dashboard": "Dashboard",
+	"serverDetailChart": {
+		"upload": "Upload",
+		"download": "Download",
+		"process": "Prozess",
+		"disk": "Festplatte",
+		"mem": "Speicher",
+		"swap": "Swap",
+		"realtime": "Echtzeit",
+		"period1d": "1 Tag",
+		"period7d": "7 Tage",
+		"period30d": "30 Tage",
+		"tsdbRequired": "Aktivieren Sie TSDB, um historische Daten zu verwenden",
+		"loginRequired": "Bitte anmelden, um die Daten anzuzeigen"
+	},
+	"language": {
+		"zh-TW": "Traditionelles Chinesisch",
+		"en-US": "Englisch",
+		"zh-CN": "Vereinfachtes Chinesisch",
+		"de-DE": "Deutsch",
+		"es-ES": "Spanisch",
+		"ru-RU": "Russisch"
+	},
+	"online": "Online",
+	"offline": "Offline",
+	"connecting": "Verbinden",
+	"serverOverview": {
+		"totalServers": "Server insgesamt",
+		"onlineServers": "Online Server",
+		"offlineServers": "Offline Server",
+		"totalUploadCard": "Gesamt Upload",
+		"totalDownloadCard": "Gesamt Download",
+		"totalBandwidth": "Gesamte Bandbreite",
+		"speed": "Geschwindigkeit",
+		"trafficRate": "Netzwerkgeschw.",
+		"trafficTotal": "Datenverkehr",
+		"network": "Netzwerk"
+	},
+	"cycleTransfer": {
+		"used": "benutzt",
+		"total": "gesamt",
+		"period": "Zeitraum",
+		"nextUpdate": "nächstes update"
+	},
+	"footer": {
+		"themeBy": "Design von "
+	},
+	"TypeCommand": "Befehl eingeben oder suchen...",
+	"NoResults": "Keine Ergebnisse gefunden.",
+	"Servers": "Server",
+	"Shortcuts": "Tastenkürzel",
+	"ToggleLightMode": "Helles Design aktivieren",
+	"ToggleDarkMode": "Dunkles Design aktivieren",
+	"ToggleSystemMode": "Systemdesign verwenden",
+	"Home": "Startseite",
+	"login": "Login",
+	"sort": {
+		"label": "Sortieren",
+		"directionDisabled": "Sortierrichtung nicht verfügbar",
+		"ascending": "Aufsteigend",
+		"descending": "Absteigend",
+		"types": {
+			"default": "Standard",
+			"name": "Name",
+			"uptime": "Betriebszeit",
+			"system": "System",
+			"cpu": "CPU",
+			"mem": "RAM",
+			"disk": "Festplatte",
+			"up": "Upload",
+			"down": "Download",
+			"up_total": "Upload ges.",
+			"down_total": "Download ges.",
+			"traffic": "Gesamttraffic",
+			"rate": "Gesamtrate"
+		},
+		"activeTypes": {
+			"up_total": "Gesamt Upload",
+			"down_total": "Gesamt Download"
+		}
+	},
+	"group": {
+		"all": "Alle"
+	}
+}

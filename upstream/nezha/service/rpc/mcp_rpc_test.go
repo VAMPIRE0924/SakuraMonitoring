@@ -16,14 +16,22 @@ import (
 )
 
 type fakeTaskStream struct {
-	sent chan *pb.Task
+	sent  chan *pb.Task
+	delay time.Duration
+	err   error
 }
 
 func newFakeStream() *fakeTaskStream {
 	return &fakeTaskStream{sent: make(chan *pb.Task, 4)}
 }
 
-func (s *fakeTaskStream) Send(t *pb.Task) error         { s.sent <- t; return nil }
+func (s *fakeTaskStream) Send(t *pb.Task) error {
+	if s.err != nil {
+		return s.err
+	}
+	s.sent <- t
+	return nil
+}
 func (s *fakeTaskStream) Recv() (*pb.TaskResult, error) { return nil, context.Canceled }
 func (s *fakeTaskStream) SetHeader(metadata.MD) error   { return nil }
 func (s *fakeTaskStream) SendHeader(metadata.MD) error  { return nil }

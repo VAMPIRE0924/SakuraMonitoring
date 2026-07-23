@@ -84,6 +84,10 @@ function localTime(code: string): string {
 	}).format(new Date());
 }
 
+function clearDocumentSelection() {
+	window.getSelection()?.removeAllRanges();
+}
+
 function SakuraCountryLocalTime({ code }: { code: string }) {
 	const [, setTick] = useState(0);
 
@@ -477,6 +481,16 @@ export default function SakuraGlobe({
 			window.cancelAnimationFrame(zoomAnimationFrameRef.current);
 			zoomAnimationFrameRef.current = null;
 		}
+		if (pointerAnimationFrameRef.current !== null) {
+			window.cancelAnimationFrame(pointerAnimationFrameRef.current);
+			pointerAnimationFrameRef.current = null;
+		}
+		clearDocumentSelection();
+		pendingPointerRef.current = null;
+		pointerDownRef.current = null;
+		pointerDraggingRef.current = false;
+		pinchActiveRef.current = false;
+		pinchDistanceRef.current = null;
 		zoomAnimationTimeRef.current = 0;
 		zoomLevelRef.current = 0;
 		zoomTargetRef.current = 0;
@@ -849,6 +863,7 @@ export default function SakuraGlobe({
 		<div
 			ref={stageRef}
 			className="sakura-globe-stage"
+			onPointerDownCapture={clearDocumentSelection}
 			onPointerMove={updatePointer}
 			onPointerLeave={clearPointer}
 		>

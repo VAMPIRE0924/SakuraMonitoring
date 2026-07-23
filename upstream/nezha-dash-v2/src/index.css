@@ -2659,6 +2659,8 @@
 		overflow-anchor: none;
 		border-radius: 12px;
 		isolation: isolate;
+		-webkit-user-select: none;
+		user-select: none;
 	}
 
 	.sakura-globe-orbit {

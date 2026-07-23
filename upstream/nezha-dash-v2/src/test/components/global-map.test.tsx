@@ -187,6 +187,34 @@ describe("SakuraMapPanel", () => {
 		expect(orbit.style.transform).toBe("translate(-50%, -50%) scale(1)");
 	});
 
+	it("clears native text selection before globe gestures and reset", () => {
+		const removeAllRanges = vi.fn();
+		const getSelection = vi
+			.spyOn(window, "getSelection")
+			.mockReturnValue({ removeAllRanges } as unknown as Selection);
+		try {
+			const { container } = renderMap(
+				<SakuraMapPanel
+					now={now}
+					serverList={[createServer({ country_code: "cn" })]}
+				/>,
+			);
+			const stage = container.querySelector(
+				".sakura-globe-stage",
+			) as HTMLElement;
+			const reset = container.querySelector(
+				".sakura-globe-reset",
+			) as HTMLElement;
+
+			fireEvent.pointerDown(stage, { button: 0, pointerType: "mouse" });
+			fireEvent.click(reset);
+
+			expect(removeAllRanges).toHaveBeenCalledTimes(2);
+		} finally {
+			getSelection.mockRestore();
+		}
+	});
+
 	it("locks the internal camera while wheel zoom scales the whole globe", () => {
 		const { container } = renderMap(
 			<SakuraMapPanel

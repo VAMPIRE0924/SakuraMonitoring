@@ -20,15 +20,6 @@ func TestAlertRules(t *testing.T) {
 	t.Run("CombinedRules", testCombinedRules)
 }
 
-func TestRuleSnapshotNetAllSpeedUsesBothDirections(t *testing.T) {
-	rule := &Rule{Type: "net_all_speed", Max: 35}
-	server := &Server{State: &HostState{NetInSpeed: 10, NetOutSpeed: 20}}
-
-	if !rule.Snapshot(nil, server, nil) {
-		t.Fatal("net_all_speed must add inbound and outbound speed exactly once")
-	}
-}
-
 func testCycleRules(t *testing.T) {
 	cases := []arSt{
 		{

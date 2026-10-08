@@ -2,7 +2,6 @@ package waf
 
 import (
 	_ "embed"
-	"html"
 	"net/http"
 	"strings"
 
@@ -15,8 +14,6 @@ import (
 
 //go:embed waf.html
 var errorPageTemplate string
-
-const DecoyPath = "/_sakura/waf"
 
 func RealIp(c *gin.Context) {
 	if singleton.Conf.WebRealIPHeader == "" {
@@ -57,10 +54,10 @@ func ShowBlockPage(c *gin.Context, err error) {
 	if err != nil {
 		errMsg = err.Error()
 	} else {
-		errMsg = "you were blocked by VAMPIRE WAF"
+		errMsg = "you were blocked by nezha WAF"
 	}
-	c.Header("Content-Type", "text/html; charset=utf-8")
 	c.Writer.WriteHeader(http.StatusForbidden)
-	c.Writer.WriteString(strings.Replace(errorPageTemplate, "{error}", html.EscapeString(errMsg), 1))
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.Writer.WriteString(strings.Replace(errorPageTemplate, "{error}", errMsg, 1))
 	c.Abort()
 }

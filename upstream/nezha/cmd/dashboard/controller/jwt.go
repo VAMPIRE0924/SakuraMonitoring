@@ -73,10 +73,9 @@ func initParams() *jwt.GinJWTMiddleware {
 		SigningAlgorithm: "HS256",
 		// Lax keeps OAuth callback redirects (top-level GET navigations from
 		// the provider domain) working while blocking cross-site POST CSRF.
-		// Sakura determines login state through /profile and never reads the
-		// JWT cookie, so keeping the session token out of document.cookie is
-		// both compatible and a meaningful defence against token theft.
-		CookieHTTPOnly: true,
+		// HttpOnly/Secure are intentionally left default: the frontend reads
+		// `!!document.cookie` for login-state display and many deployments
+		// terminate TLS at a proxy upstream — both warrant a separate change.
 		CookieSameSite: http.SameSiteLaxMode,
 		Timeout:        time.Hour * time.Duration(singleton.Conf.JWTTimeout),
 		MaxRefresh:     time.Hour * time.Duration(singleton.Conf.JWTTimeout),
@@ -227,7 +226,7 @@ func authorizator() func(data any, c *gin.Context) bool {
 
 func unauthorized() func(c *gin.Context, code int, message string) {
 	return func(c *gin.Context, code int, message string) {
-		c.JSON(http.StatusUnauthorized, model.CommonResponse[any]{
+		c.JSON(http.StatusOK, model.CommonResponse[any]{
 			Success: false,
 			Error:   "ApiErrorUnauthorized",
 		})

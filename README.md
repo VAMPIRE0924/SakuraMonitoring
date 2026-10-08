@@ -15,6 +15,8 @@ Sakura Monitoring 是面向哪吒监控的独立前台主题。主题直接使�
 
 正式 Linux `amd64` 与 `arm64` 包由 `.github/workflows/build.yml` 构建和验证；`v*` 标签会创建 GitHub Release。
 
+构建工具链锁定为 Go `1.26.8`，与官方 `v2.3.18` 发布使用的版本一致。发布验证包含旧、新 Agent 的持续上报、任务连接、WebSocket 在线状态和 GPU 显存契约检查。
+
 ## 升级
 
 ```bash

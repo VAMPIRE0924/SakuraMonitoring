@@ -32,6 +32,7 @@ import (
 type xferStreamMux struct {
 	agent func(req *model.FsTransferRequest, dashboardSide io.ReadWriteCloser) ([]byte, error)
 }
+
 func (m *xferStreamMux) Send(t *pb.Task) error {
 	if t.GetType() != model.TaskTypeFsTransfer {
 		return nil

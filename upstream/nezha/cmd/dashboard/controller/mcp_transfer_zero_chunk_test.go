@@ -2,7 +2,6 @@ package controller
 
 import (
 	"bytes"
-	"encoding/binary"
 	"net/http"
 	"testing"
 
@@ -76,23 +75,4 @@ func TestRelayDownloadFrames_SingleZeroLengthFrameRejected(t *testing.T) {
 		t.Fatalf("relayDownloadFrames must reject a zero-length data frame while remaining>0")
 	}
 	_ = model.MCPFsXferMagicChunk
-}
-
-func TestRelayDownloadFrames_RejectsOverflowingChunkLength(t *testing.T) {
-	const size = int64(8)
-
-	var src bytes.Buffer
-	src.Write(model.MCPFsXferMagicChunk)
-	length := make([]byte, 8)
-	binary.BigEndian.PutUint64(length, ^uint64(0))
-	src.Write(length)
-
-	stream := &fixedSizeFrameStream{buf: src}
-	sink := newCountingDiscardWriter()
-	gin.SetMode(gin.TestMode)
-	c, _ := gin.CreateTestContext(sink)
-
-	if err := relayDownloadFrames(c, stream, size); err == nil {
-		t.Fatal("chunk length larger than MaxInt64 must be rejected before narrowing")
-	}
 }

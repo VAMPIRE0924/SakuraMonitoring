@@ -42,6 +42,8 @@ release_scripts=(
   build-sakura-release.sh
   build-sakura-user-dist.sh
   check-sakura-template.sh
+  check-h2c-liveness.mjs
+  check-agent-stream.go
   enforce-theme-boundary.sh
   geoip-db-tool.go
   mac-verify.sh

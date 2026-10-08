@@ -59,16 +59,31 @@ if readelf -l "$binary" | grep -Fq 'INTERP'; then
   exit 1
 fi
 echo "ELF interpreter: absent (static release)"
-go version -m "$binary" | sed -n '1,12p'
+build_info=$(go version -m "$binary")
+printf '%s\n' "$build_info" > "$release_tmp/build-info.txt"
+printf '%s\n' "$build_info" | sed -n '1,12p'
+expected_go=$(node -p "require(process.argv[1]).toolchain.go" "$workspace_root/upstreams.lock.json")
+actual_go=$(printf '%s\n' "$build_info" | head -n 1 | awk '{print $NF}')
+if [[ "$actual_go" != "go$expected_go" ]]; then
+  echo "Release used $actual_go, expected official-aligned go$expected_go." >&2
+  exit 1
+fi
+for setting in 'CGO_ENABLED=1' 'GOOS=linux' "GOARCH=$expected_arch" '-tags=go_json'; do
+  if ! grep -Fq -- "$setting" "$release_tmp/build-info.txt"; then
+    echo "Release build metadata is missing $setting." >&2
+    exit 1
+  fi
+done
+strings "$binary" > "$release_tmp/binary-strings.txt"
 
-if strings "$binary" | grep -Fq 'go-sqlite3 requires cgo'; then
+if grep -Fq 'go-sqlite3 requires cgo' "$release_tmp/binary-strings.txt"; then
   echo "The binary contains the go-sqlite3 CGO stub." >&2
   exit 1
 fi
 echo "CGO stub string: absent"
 
 for forbidden_theme in 'Nazhua' 'Aobobo' 'Nezha-ASCII' 'Nezha-Pixel'; do
-  if strings "$binary" | grep -Fq "$forbidden_theme"; then
+  if grep -Fq "$forbidden_theme" "$release_tmp/binary-strings.txt"; then
     echo "Release contains unsupported frontend theme: $forbidden_theme" >&2
     exit 1
   fi
@@ -96,6 +111,7 @@ listen_host: 127.0.0.1
 listen_port: 18080
 language: zh_CN
 site_name: Sakura smoke test
+agent_secret_key: sakura-release-agent-smoke-only
 custom_code: '<style>/* sakura-public-smoke */</style>'
 custom_code_dashboard: '<style>/* sakura-dashboard-appearance-smoke */</style>'
 user_template: sakura-user-dist
@@ -148,21 +164,9 @@ fi
 
 echo "Startup smoke test: /api/v1/setting responded"
 
-waf_status=$(curl --silent --dump-header "$smoke_root/waf.headers" --output "$smoke_root/waf.html" \
-  --write-out '%{http_code}' http://127.0.0.1:18080/_sakura/waf)
-if [[ $waf_status != 403 ]]; then
-  cat "$smoke_root/waf.html" >&2
-  echo "WAF decoy status was $waf_status, expected 403." >&2
-  exit 1
-fi
-if ! grep -Fq 'VAMPIRE WAF' "$smoke_root/waf.html"; then
-  cat "$smoke_root/waf.html" >&2
-  echo "WAF decoy does not contain the VAMPIRE WAF brand." >&2
-  exit 1
-fi
-waf_content_type=$(tr -d '\r' < "$smoke_root/waf.headers" | awk -F ': ' 'tolower($1) == "content-type" { print $2 }')
-if [[ $waf_content_type != 'text/html; charset=utf-8' ]]; then
-  echo "WAF decoy Content-Type was $waf_content_type, expected HTML." >&2
-  exit 1
-fi
-echo "Startup smoke test: VAMPIRE WAF decoy responded"
+node "$script_dir/check-h2c-liveness.mjs" http://127.0.0.1:18080
+(
+  cd "$backend_root"
+  SAKURA_SMOKE_AGENT_SECRET=sakura-release-agent-smoke-only \
+    go run "$script_dir/check-agent-stream.go" 127.0.0.1:18080
+)

@@ -36,10 +36,10 @@ func NewServerClass() *ServerClass {
 	var servers []model.Server
 	DB.Find(&servers)
 	for i := range servers {
-		server := &servers[i]
-		model.InitServer(server)
-		sc.list[server.ID] = server
-		sc.uuidToID[server.UUID] = server.ID
+		innerS := &servers[i]
+		model.InitServer(innerS)
+		sc.list[innerS.ID] = innerS
+		sc.uuidToID[innerS.UUID] = innerS.ID
 	}
 	sc.sortList()
 

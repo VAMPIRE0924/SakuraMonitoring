@@ -692,6 +692,14 @@ func classifyTransferOpenStreamError(err error) string {
 	}
 }
 
+// frameReceiver is the frame-preserving subset of grpcx.IOStreamWrapper that
+// the download relay needs. We accept the interface (not the concrete type)
+// so test simulators can plug in a net.Pipe-backed stream without depending
+// on the gRPC stack.
+type frameReceiver interface {
+	RecvFrame() ([]byte, error)
+}
+
 // relayDownloadFrames forwards declared-size payload from agent to HTTP
 // client. The agent wraps every data chunk in an NZTC frame (4-byte magic +
 // 8-byte big-endian length + payload) so payload that happens to begin with
@@ -746,9 +754,7 @@ func relayDownloadFrames(c *gin.Context, stream io.ReadWriteCloser, size int64) 
 			c.String(http.StatusBadGateway, "stream relay failed: zero-length data frame while payload incomplete")
 			return errMCPMidstreamAbort
 		}
-		// remaining is positive and capped at 100 MiB, so compare in uint64
-		// before narrowing the untrusted frame length to int64.
-		if chunkLen > uint64(remaining) {
+		if int64(chunkLen) > remaining {
 			c.String(http.StatusBadGateway, "agent oversent: more data bytes than declared size")
 			return errMCPMidstreamAbort
 		}

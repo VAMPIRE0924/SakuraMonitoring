@@ -459,9 +459,13 @@ func newMCPError(code, msg string) *mcpError { return &mcpError{Code: code, Msg:
 
 // 预制错误
 var (
-	errMCPInvalidArgs   = func(s string) *mcpError { return newMCPError(model.MCPOutcomeInvalidArgs, s) }
-	errMCPPermDenied    = newMCPError(model.MCPOutcomePermDenied, "permission denied")
+	errMCPInvalidArgs = func(s string) *mcpError { return newMCPError(model.MCPOutcomeInvalidArgs, s) }
+	errMCPPermDenied  = newMCPError(model.MCPOutcomePermDenied, "permission denied")
+	errMCPScopeDenied = func(s string) *mcpError {
+		return newMCPError(model.MCPOutcomeScopeDenied, "missing required scope: "+s)
+	}
 	errMCPServerOffline = newMCPError(model.MCPOutcomeServerOffline, "agent offline")
+	errMCPAgentTimeout  = newMCPError(model.MCPOutcomeAgentTimeout, "agent did not respond within timeout")
 	errMCPUnsupported   = newMCPError(model.MCPOutcomeUnsupportedAgent, "agent does not support this MCP capability; please upgrade the agent")
 )
 

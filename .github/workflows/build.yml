@@ -59,6 +59,10 @@ jobs:
           ./scripts/build-sakura-user-dist.sh --skip-install
           ./scripts/check-sakura-template.sh
 
+      - name: Verify backend
+        working-directory: upstream/nezha
+        run: go test ./...
+
       - name: Build Linux dashboard
         shell: bash
         env:

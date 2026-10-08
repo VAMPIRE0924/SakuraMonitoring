@@ -46,6 +46,9 @@ func listConfig(c *gin.Context) (*model.SettingResponse, error) {
 
 	if !authorized || !isAdmin {
 		configForGuests := config.ConfigForGuests
+		// Upstream stores this field in ConfigForGuests, but Sakura only exposes
+		// dashboard customization to administrators. Clear the response copy only.
+		configForGuests.CustomCodeDashboard = ""
 		var configDashboard model.ConfigDashboard
 		if authorized {
 			configDashboard.AgentTLS = singleton.Conf.AgentTLS

@@ -26,6 +26,29 @@ describe("nezha api fetchers", () => {
 		vi.stubGlobal("fetch", vi.fn());
 	});
 
+	it.each([
+		200, 401,
+	])("recognizes official unauthorized responses with HTTP %i", async (status) => {
+		vi.mocked(fetch).mockResolvedValueOnce(
+			jsonResponse({ error: "ApiErrorUnauthorized" }, { status }),
+		);
+		let authError: unknown;
+		try {
+			await fetchLoginUser();
+		} catch (error) {
+			authError = error;
+		}
+		expect(authError).toBeInstanceOf(NezhaApiError);
+		expect(authError).toMatchObject({
+			status: 401,
+			message: "ApiErrorUnauthorized",
+		});
+		expect(
+			isAuthenticatedProfile({ success: true, data: { id: 1 } }, authError),
+		).toBe(false);
+		expect(fetch).toHaveBeenCalledOnce();
+	});
+
 	it("returns setting payloads", async () => {
 		const payload = {
 			success: true,

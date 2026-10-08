@@ -399,6 +399,11 @@ async function fetchJson(input: RequestInfo | URL, init?: RequestInit) {
 			? Reflect.get(data, "error")
 			: undefined;
 	const errorMessage = typeof apiError === "string" ? apiError : "";
+	// Official JWT middleware may report unauthorized with HTTP 200. Treat
+	// that application error as expired auth, including when profile data is cached.
+	if (response.status === 200 && errorMessage === "ApiErrorUnauthorized") {
+		throw new NezhaApiError(errorMessage, 401);
+	}
 	if (!response.ok) {
 		throw new NezhaApiError(
 			errorMessage || `Request failed (${response.status})`,

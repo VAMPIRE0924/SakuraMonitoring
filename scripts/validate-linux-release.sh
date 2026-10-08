@@ -67,7 +67,7 @@ if strings "$binary" | grep -Fq 'go-sqlite3 requires cgo'; then
 fi
 echo "CGO stub string: absent"
 
-for forbidden_theme in 'Nazhua' 'Aobobo' 'Nezha-ASCII'; do
+for forbidden_theme in 'Nazhua' 'Aobobo' 'Nezha-ASCII' 'Nezha-Pixel'; do
   if strings "$binary" | grep -Fq "$forbidden_theme"; then
     echo "Release contains unsupported frontend theme: $forbidden_theme" >&2
     exit 1

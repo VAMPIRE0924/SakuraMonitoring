@@ -60,6 +60,9 @@ func routers(r *gin.Engine, frontendDist fs.FS) {
 	if err := authMiddleware.MiddlewareInit(); err != nil {
 		log.Fatal("authMiddleware.MiddlewareInit Error:" + err.Error())
 	}
+	// Signature-only view used to identify dashboard-issued credentials before
+	// NAT forwarding. Authentication itself still uses the validating parser.
+	dashboardCredentialJWTParser = newDashboardCredentialJWTParser(authMiddleware)
 	// /mcp — Model Context Protocol endpoint, authenticated by PAT only (闸 1 + 闸 2)。
 	// 不放在 /api/v1 下：MCP client 配置 URL 更短，且 MCP transport 协议演进与 REST API
 	// 解耦。鉴权一律走 apiTokenAuthMiddleware；不接受 JWT 以避免浏览器误触。
@@ -310,6 +313,18 @@ func listHandler[S ~[]E, E model.CommonInterface](handler handlerFunc[S]) func(*
 
 		filtered := filter(c, data)
 		c.JSON(http.StatusOK, model.CommonResponse[S]{Success: true, Data: model.SearchByIDCtx(c, filtered)})
+	}
+}
+
+func pCommonHandler[S ~[]E, E any](handler pHandlerFunc[S, E]) func(*gin.Context) {
+	return func(c *gin.Context) {
+		data, err := handler(c)
+		if err != nil {
+			c.JSON(http.StatusOK, newErrorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, model.PaginatedResponse[S, E]{Success: true, Data: data})
 	}
 }
 

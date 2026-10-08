@@ -46,6 +46,12 @@ function percentage(value: unknown) {
 	return Math.min(100, nonNegativeNumber(value));
 }
 
+function optionalMemory(value: unknown) {
+	return typeof value === "number" && Number.isFinite(value) && value >= 0
+		? value
+		: undefined;
+}
+
 function stringValue(value: unknown) {
 	return typeof value === "string" ? value : "";
 }
@@ -94,6 +100,19 @@ function normalizeServer(
 			})
 		: [];
 
+	// Keep card positions even when one entry is malformed: host.gpu and the
+	// legacy utilization array use the same indexes as the new memory figures.
+	const gpus = Array.isArray(state.gpus)
+		? state.gpus.map((item) => {
+				const card = isRecord(item) ? item : {};
+				return {
+					utilization: percentage(card.utilization),
+					memory_used: optionalMemory(card.memory_used),
+					memory_total: optionalMemory(card.memory_total),
+				};
+			})
+		: undefined;
+
 	return {
 		id: Number(value.id),
 		name: value.name,
@@ -132,6 +151,7 @@ function normalizeServer(
 			process_count: nonNegativeNumber(state.process_count),
 			temperatures,
 			gpu: numberArray(state.gpu, percentage),
+			gpus,
 		},
 	};
 }

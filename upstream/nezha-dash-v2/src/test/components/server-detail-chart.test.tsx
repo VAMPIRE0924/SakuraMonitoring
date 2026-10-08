@@ -267,6 +267,17 @@ describe("ServerDetailChart", () => {
 		expect(detailChartMocks.fetchServerMetrics).not.toHaveBeenCalled();
 	});
 
+	it("shows per-card GPU memory in bytes while accepting legacy agents", async () => {
+		seedWebSocketData();
+		if (detailChartMocks.lastData) {
+			detailChartMocks.lastData.servers[0].state.gpus = [
+				{ utilization: 33, memory_used: 4096, memory_total: 16384 },
+			];
+		}
+		renderWithQuery(<ServerDetailChart server_id="7" />);
+		expect(await screen.findByText("4 GiB / 16 GiB")).toBeInTheDocument();
+	});
+
 	it("keeps websocket history loaded on the initial realtime render", async () => {
 		seedWebSocketData();
 

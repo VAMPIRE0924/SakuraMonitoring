@@ -20,6 +20,7 @@ case "$goarch" in
 esac
 
 backend_root="$workspace_root/upstream/nezha"
+"$workspace_root/scripts/enforce-theme-boundary.sh" --workspace-root "$workspace_root" --require-sakura
 if [[ ! -f "$backend_root/go.mod" ]]; then
   echo "Nezha backend source not found: $backend_root" >&2
   exit 1

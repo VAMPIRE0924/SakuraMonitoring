@@ -46,6 +46,12 @@ func initSystem(bus chan<- *model.Service) error {
 	if err := singleton.DB.Model(&model.User{}).Count(&usersCount).Error; err != nil {
 		return err
 	}
+	// Backward-compatible bootstrap state: existing installers and recovery
+	// procedures expect the first login on an empty database to be admin/admin.
+	// This is not a permanent credential or an authentication-bypass fallback;
+	// operators must complete initialization and change it before exposing the
+	// Dashboard. Replacing it requires a coordinated installer/migration flow so
+	// existing unattended installations are not locked out.
 	if usersCount == 0 {
 		hash, err := bcrypt.GenerateFromPassword([]byte("admin"), bcrypt.DefaultCost)
 		if err != nil {
@@ -163,6 +169,7 @@ func main() {
 	grpcHandler := rpc.ServeRPC()
 	httpHandler := controller.ServeWeb(frontendDist)
 	controller.InitUpgrader()
+	wireNATDashboardCredentialGate()
 
 	muxHandler := newHTTPandGRPCMux(httpHandler, grpcHandler)
 	muxServerHTTP := &http.Server{
@@ -220,6 +227,18 @@ func main() {
 	}
 
 	close(errChan)
+}
+
+// wireNATDashboardCredentialGate connects the NAT ingress to the real
+// dashboard-credential classifiers. The NAT ingress strips dashboard-issued
+// credentials (panel JWT / panel PAT) from every channel the panel's own
+// TokenLookup accepts — the Authorization header, the ?token= query parameter
+// and the nz-jwt cookie — before tunneling a request to the agent, and
+// forwards foreign values untouched. ServeWeb built the JWT parser the
+// classifier reuses, so the gate is wired right after it and before any
+// listener starts serving.
+func wireNATDashboardCredentialGate() {
+	rpc.SetNATDashboardCredentialGate(controller.ClassifyDashboardCredentialValues)
 }
 
 func newHTTPandGRPCMux(httpHandler http.Handler, grpcHandler http.Handler) http.Handler {

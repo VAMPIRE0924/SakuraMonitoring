@@ -177,6 +177,16 @@ function createServer(index) {
 			process_count: 40 + (index % 240),
 			temperatures: [],
 			gpu: index % 40 === 0 ? [(index * 3) % 100] : [],
+			gpus:
+				index % 40 === 0
+					? [
+							{
+								utilization: (index * 3) % 100,
+								memory_used: 4096,
+								memory_total: 16384,
+							},
+						]
+					: [],
 		},
 	};
 }

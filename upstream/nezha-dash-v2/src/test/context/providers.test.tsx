@@ -132,6 +132,9 @@ function WebSocketProbe() {
 					? `${lastData.servers[0].host.cpu[0] || "none"}:${lastData.servers[0].state.load_1}:${lastData.servers[0].state.cpu}:${lastData.servers[0].state.net_in_speed}:${lastData.servers[0].state.gpu.join(",")}:${lastData.servers[0].state.temperatures[0]?.Temperature}:${lastData.servers[0].state.temperatures.length}`
 					: "none"}
 			</p>
+			<p data-testid="gpu-memory">
+				{JSON.stringify(lastData?.servers[0]?.state.gpus ?? [])}
+			</p>
 			<p data-testid="public-note">
 				{lastData?.servers[0]?.public_note || "none"}
 			</p>
@@ -382,6 +385,44 @@ describe("WebSocketProvider", () => {
 		expect(screen.getByTestId("normalized-server")).toHaveTextContent(
 			"Legacy CPU:0:100:0:100,0,0:-12.5:1",
 		);
+	});
+
+	it("preserves GPU memory card indexes and accepts legacy agents", () => {
+		renderWebSocketProvider(<WebSocketProbe />);
+		const socket = FakeWebSocket.instances[0];
+		const server = createServer();
+		act(() => {
+			socket.open();
+			socket.message(JSON.stringify({ now: 1, servers: [server] }));
+		});
+		expect(screen.getByTestId("gpu-memory")).toHaveTextContent("[]");
+		act(() => {
+			socket.message(
+				JSON.stringify({
+					now: 2,
+					servers: [
+						{
+							...server,
+							state: {
+								...server.state,
+								gpus: [
+									null,
+									{ utilization: 120, memory_used: 0, memory_total: 16384 },
+									{ utilization: -1, memory_used: -1, memory_total: "invalid" },
+								],
+							},
+						},
+					],
+				}),
+			);
+		});
+		expect(
+			JSON.parse(screen.getByTestId("gpu-memory").textContent ?? "[]"),
+		).toEqual([
+			{ utilization: 0 },
+			{ utilization: 100, memory_used: 0, memory_total: 16384 },
+			{ utilization: 0 },
+		]);
 	});
 
 	it("preserves omitted public notes but accepts an explicit clear", () => {

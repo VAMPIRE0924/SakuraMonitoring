@@ -141,7 +141,14 @@
 		"de-DE": "Deutsch",
 		"es-ES": "Español",
 		"ru-RU": "Русский",
-		"ta-IN": "தமிழ்"
+		"ta-IN": "தமிழ்",
+		"fr": "Français",
+		"gl": "Galego",
+		"id": "Bahasa Indonesia",
+		"ja": "日本語",
+		"pt_BR": "Português (Brasil)",
+		"ro": "Română",
+		"uk": "Українська"
 	},
 	"theme": {
 		"light": "Light",

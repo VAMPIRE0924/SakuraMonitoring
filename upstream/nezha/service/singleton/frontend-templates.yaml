@@ -2,14 +2,14 @@
   name: "OfficialAdmin"
   repository: "https://github.com/nezhahq/admin-frontend"
   author: "nezhahq"
-  version: "v2.3.0"
+  version: "v2.3.8"
   is_admin: true
   is_official: true
 - path: "user-dist"
   name: "Official"
   repository: "https://github.com/hamster1963/nezha-dash-v2"
   author: "hamster1963"
-  version: "v2.4.2"
+  version: "v2.4.3"
   is_official: true
 - path: "sakura-user-dist"
   name: "Sakura"

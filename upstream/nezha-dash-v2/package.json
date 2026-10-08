@@ -1,7 +1,7 @@
 {
 	"name": "nezha-dash-v2",
 	"private": true,
-	"version": "2.0.2",
+	"version": "2.4.3",
 	"type": "module",
 	"engines": {
 		"node": ">=22",
@@ -75,7 +75,7 @@
 		"@vitejs/plugin-react": "^6.0.3",
 		"@vitest/coverage-v8": "^4.1.9",
 		"jsdom": "^29.1.1",
-		"postcss": "8.5.15",
+		"postcss": "8.5.18",
 		"tailwindcss": "^4.3.2",
 		"typescript": "~6.0.3",
 		"vite": "^8.1.3",

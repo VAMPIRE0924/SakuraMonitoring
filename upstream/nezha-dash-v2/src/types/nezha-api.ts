@@ -45,6 +45,12 @@ interface NezhaServerStatus {
 	process_count: number;
 	temperatures: Temperature[];
 	gpu: number[];
+	// Per-card figures; index-aligned with host.gpu. Absent on older agents.
+	gpus?: {
+		utilization: number;
+		memory_used?: number;
+		memory_total?: number;
+	}[];
 }
 
 interface Temperature {

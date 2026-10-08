@@ -152,6 +152,8 @@ type ServerTransferClass struct {
 
 	subMu     sync.Mutex
 	subs      map[uint64]chan *model.ServerTransfer
+	subOwners map[uint64]uint64
+	subCounts map[uint64]int
 	nextSubID uint64
 
 	timeout  time.Duration
@@ -173,6 +175,18 @@ var ErrServerAlreadyTransferring = errors.New("server already has an in-flight t
 // reply. If the agent has never connected (Server.Host == nil) the check is
 // deferred to OnAgentReconnect / PushIfOnline.
 var ErrAgentTooOldForTransfer = fmt.Errorf("agent build older than %s does not support server transfer (TaskTypeServerTransferApply)", MinServerTransferAgentVersion)
+
+const (
+	// A normal dashboard needs one subscription per open transfer page. Keep a
+	// small per-user allowance for tabs/devices plus a process-wide hard stop.
+	maxServerTransferSubscribersPerUser = 8
+	maxServerTransferSubscribersGlobal  = 1024
+)
+
+var (
+	errTooManyServerTransferSubscribersForUser = errors.New("too many concurrent server transfer subscribers for this user")
+	errTooManyServerTransferSubscribersGlobal  = errors.New("too many concurrent server transfer subscribers")
+)
 
 // agentSupportsTransfer reports whether s has reported a build version >=
 // MinServerTransferAgentVersion. Returns true when version is unknown (agent
@@ -210,6 +224,8 @@ func NewServerTransferClass() *ServerTransferClass {
 		verifiedHandshakes:     make(map[uint64]string),
 		initiating:             make(map[uint64]bool),
 		subs:                   make(map[uint64]chan *model.ServerTransfer),
+		subOwners:              make(map[uint64]uint64),
+		subCounts:              make(map[uint64]int),
 		timeout:                defaultServerTransferTimeout,
 		stopCh:                 make(chan struct{}),
 	}
@@ -663,11 +679,9 @@ func (c *ServerTransferClass) Initiate(tx *gorm.DB, serverID, fromUserID, toUser
 // and admits the old AgentSecret on the happy "owner match" path —
 // bypassing the bounded pending-tolerance contract.
 func (c *ServerTransferClass) Register(t *model.ServerTransfer) {
-	if s, ok := ServerShared.Get(t.ServerID); ok && s != nil {
-		// SetUserID over atomic write — auth.go hot path concurrently
-		// reads this field; a plain assignment would be a data race.
-		s.SetUserID(t.ToUserID)
-	}
+	// SetUserID uses an atomic write because auth.go reads this hot-path field
+	// concurrently; ServerClass also serializes it with service reports.
+	ServerShared.setUserID(t.ServerID, t.ToUserID)
 
 	c.mu.Lock()
 	c.pending[t.ServerID] = t
@@ -1163,9 +1177,7 @@ func (c *ServerTransferClass) revertTransition(transferID uint64, newStatus mode
 	// no longer admits the destination user's global AgentSecret via
 	// ServerShared.GetUserID() == userId on the happy "owner match" path.
 	if transitionedByThisCall {
-		if s, ok := ServerShared.Get(t.ServerID); ok && s != nil {
-			s.SetUserID(t.FromUserID)
-		}
+		ServerShared.setUserID(t.ServerID, t.FromUserID)
 	}
 
 	// Self-heal: any non-Pending DB status invalidates the in-memory entry —
@@ -1414,20 +1426,37 @@ func (c *ServerTransferClass) sweepTimeouts() {
 // Subscribe registers a channel that will receive every transfer transition
 // event from this point forward. The caller MUST Unsubscribe when done or
 // the broker will block forever if the channel is unbuffered or full.
-func (c *ServerTransferClass) Subscribe() (uint64, <-chan *model.ServerTransfer) {
+func (c *ServerTransferClass) Subscribe(userID uint64) (uint64, <-chan *model.ServerTransfer, error) {
 	c.subMu.Lock()
 	defer c.subMu.Unlock()
+	if len(c.subs) >= maxServerTransferSubscribersGlobal {
+		return 0, nil, errTooManyServerTransferSubscribersGlobal
+	}
+	if c.subCounts[userID] >= maxServerTransferSubscribersPerUser {
+		return 0, nil, errTooManyServerTransferSubscribersForUser
+	}
 
 	id := atomic.AddUint64(&c.nextSubID, 1)
 	ch := make(chan *model.ServerTransfer, 16)
 	c.subs[id] = ch
-	return id, ch
+	c.subOwners[id] = userID
+	c.subCounts[userID]++
+	return id, ch, nil
 }
 
 func (c *ServerTransferClass) Unsubscribe(id uint64) {
 	c.subMu.Lock()
 	ch, ok := c.subs[id]
+	ownerID, ownerOK := c.subOwners[id]
 	delete(c.subs, id)
+	delete(c.subOwners, id)
+	if ownerOK {
+		if c.subCounts[ownerID] <= 1 {
+			delete(c.subCounts, ownerID)
+		} else {
+			c.subCounts[ownerID]--
+		}
+	}
 	c.subMu.Unlock()
 	if ok {
 		close(ch)

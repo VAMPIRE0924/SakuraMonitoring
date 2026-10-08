@@ -450,6 +450,7 @@ export default function ServerDetailChart({
 
 	const gpuStats = server.state.gpu || [];
 	const gpuList = server.host.gpu || [];
+	const gpuDetails = server.state.gpus || [];
 
 	return (
 		<section className="flex flex-col">
@@ -475,6 +476,7 @@ export default function ServerDetailChart({
 									now={nezhaWsData.now}
 									gpuStat={gpu}
 									gpuName={gpuList[index] || `#${index + 1}`}
+									gpuMemory={gpuDetails[index]}
 									messageHistory={messageHistory}
 									period={selectedPeriod}
 									key={`${server.id}-${index}`}
@@ -657,6 +659,7 @@ function GpuChart({
 	index,
 	gpuStat,
 	gpuName,
+	gpuMemory,
 	messageHistory,
 	now,
 	period,
@@ -666,6 +669,7 @@ function GpuChart({
 	index: number | null;
 	gpuStat: number;
 	gpuName?: string;
+	gpuMemory?: { memory_used?: number; memory_total?: number };
 	messageHistory: NezhaWebsocketResponse[];
 	period: ChartPeriod;
 }) {
@@ -720,6 +724,18 @@ function GpuChart({
 					<section className="flex flex-col items-center gap-2">
 						{!gpuName && <p className="text-md font-medium">GPU</p>}
 						{gpuName && <p className="text-xs mt-1 mb-1.5">GPU: {gpuName}</p>}
+						{gpuMemory?.memory_total != null &&
+						Number.isFinite(gpuMemory.memory_total) &&
+						gpuMemory.memory_total > 0 ? (
+							<p className="text-xs text-muted-foreground">
+								{gpuMemory.memory_used != null &&
+								Number.isFinite(gpuMemory.memory_used) &&
+								gpuMemory.memory_used >= 0
+									? formatSakuraBytes(gpuMemory.memory_used * 1024 * 1024)
+									: "—"}{" "}
+								/ {formatSakuraBytes(gpuMemory.memory_total * 1024 * 1024)}
+							</p>
+						) : null}
 					</section>
 					<section className="flex items-center gap-2">
 						<p className="text-xs text-end w-10 font-medium">

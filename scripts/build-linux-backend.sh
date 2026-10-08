@@ -6,6 +6,11 @@ version=${2:?semantic version is required}
 output_path=${3:?output path is required}
 goarch=${4:-amd64}
 
+if [[ $(uname -s) != Linux ]]; then
+  echo "Formal Linux packages must be built by the Linux workflow runner." >&2
+  exit 1
+fi
+
 if [[ ! $version =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "Version must be a semantic release version such as v2.2.9: $version" >&2
   exit 1
@@ -70,29 +75,7 @@ cleanup() {
 trap cleanup EXIT
 
 geoip_tool="$workspace_root/scripts/geoip-db-tool.go"
-if [[ -n ${GEOIP_DB_PATH:-} ]]; then
-  cp "$GEOIP_DB_PATH" "$geoip_path"
-elif [[ -n ${IPINFO_TOKEN:-} ]]; then
-  curl --fail --location --retry 3 \
-    "https://ipinfo.io/data/free/country.mmdb?token=$IPINFO_TOKEN" \
-    --output "$geoip_path"
-else
-  official_zip="$geoip_work/dashboard-linux-$goarch.zip"
-  official_dir="$geoip_work/official"
-  curl --fail --location --retry 3 \
-    "https://github.com/nezhahq/nezha/releases/download/$version/dashboard-linux-$goarch.zip" \
-    --output "$official_zip"
-  unzip -q "$official_zip" -d "$official_dir"
-  go run "$geoip_tool" extract \
-    "$official_dir/dashboard-linux-$goarch" "$geoip_path"
-fi
-go run "$geoip_tool" validate "$geoip_path"
-
-if [[ ! -f cmd/dashboard/docs/docs.go ]]; then
-  go run github.com/swaggo/swag/cmd/swag@v1.16.6 \
-    init -g cmd/dashboard/main.go -o cmd/dashboard/docs \
-    --parseDependency --parseInternal
-fi
+bash "$workspace_root/scripts/prepare-backend-resources.sh" "$workspace_root" "$version" "$goarch"
 
 ldflags="-s -w -X github.com/nezhahq/nezha/service/singleton.Version=$version -extldflags '-static -fpic'"
 CGO_ENABLED=1 GOOS=linux GOARCH="$goarch" CC="$cc" \

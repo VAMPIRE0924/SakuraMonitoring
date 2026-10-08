@@ -48,6 +48,7 @@ release_scripts=(
   geoip-db-tool.go
   mac-verify.sh
   prepare-official-frontend-dists.sh
+  prepare-backend-resources.sh
   sakura-maintenance.mjs
   sakura-maintenance.test.mjs
   sync-github-macos.sh

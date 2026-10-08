@@ -59,6 +59,14 @@ jobs:
           ./scripts/build-sakura-user-dist.sh --skip-install
           ./scripts/check-sakura-template.sh
 
+      - name: Prepare backend resources
+        shell: bash
+        env:
+          IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
+        run: |
+          version=$(node -p "require('./upstreams.lock.json').backend.version")
+          bash ./scripts/prepare-backend-resources.sh "$GITHUB_WORKSPACE" "$version" "${{ matrix.arch }}"
+
       - name: Verify backend
         working-directory: upstream/nezha
         # Upstream workflow-policy tests require its own CI files, which are
@@ -68,7 +76,7 @@ jobs:
       - name: Build Linux dashboard
         shell: bash
         env:
-          IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN }}
+          GEOIP_DB_PATH: ${{ github.workspace }}/upstream/nezha/pkg/geoip/geoip.db
         run: |
           version=$(node -p "require('./upstreams.lock.json').backend.version")
           bash ./scripts/build-linux-backend.sh "$GITHUB_WORKSPACE" "$version" \

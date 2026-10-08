@@ -97,7 +97,7 @@ listen_port: 18080
 language: zh_CN
 site_name: Sakura smoke test
 custom_code: '<style>/* sakura-public-smoke */</style>'
-custom_code_dashboard: '<style>/* sakura-private-dashboard-smoke */</style>'
+custom_code_dashboard: '<style>/* sakura-dashboard-appearance-smoke */</style>'
 user_template: sakura-user-dist
 admin_template: admin-dist
 tsdb:
@@ -137,9 +137,8 @@ if grep -Fq 'go-sqlite3 requires cgo' "$smoke_root/dashboard.log"; then
   exit 1
 fi
 
-if grep -Fq 'custom_code_dashboard' "$smoke_root/setting.json"; then
-  cat "$smoke_root/setting.json" >&2
-  echo "Anonymous setting response exposed dashboard custom code." >&2
+if ! grep -Fq 'sakura-dashboard-appearance-smoke' "$smoke_root/setting.json"; then
+  echo "Anonymous setting response lost dashboard/login customization." >&2
   exit 1
 fi
 if ! grep -Fq 'sakura-public-smoke' "$smoke_root/setting.json"; then

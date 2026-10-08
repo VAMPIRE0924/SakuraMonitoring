@@ -12,10 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestListConfigDashboardCodeVisibility(t *testing.T) {
+func TestListConfigPreservesCustomAppearance(t *testing.T) {
 	original := singleton.Conf
 	t.Cleanup(func() { singleton.Conf = original })
-	const dashboardCode = "<style>/* private dashboard appearance */</style>"
+	const dashboardCode = "<style>/* dashboard and login appearance */</style>"
 	const frontendCode = "<style>/* public frontend appearance */</style>"
 	singleton.Conf = &singleton.ConfigClass{Config: &model.Config{
 		ConfigForGuests: model.ConfigForGuests{
@@ -25,13 +25,12 @@ func TestListConfigDashboardCodeVisibility(t *testing.T) {
 		ConfigDashboard: model.ConfigDashboard{InstallHost: "agent.example.invalid", AgentTLS: true},
 	}}
 	for _, tc := range []struct {
-		name  string
-		user  *model.User
-		admin bool
+		name string
+		user *model.User
 	}{
 		{name: "anonymous"},
 		{name: "member", user: &model.User{Role: model.RoleMember}},
-		{name: "admin", user: &model.User{Role: model.RoleAdmin}, admin: true},
+		{name: "admin", user: &model.User{Role: model.RoleAdmin}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
@@ -51,12 +50,8 @@ func TestListConfigDashboardCodeVisibility(t *testing.T) {
 			require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
 			require.True(t, body.Success)
 			require.Equal(t, frontendCode, body.Data.Config["custom_code"])
-			if tc.admin {
-				require.Equal(t, dashboardCode, body.Data.Config["custom_code_dashboard"])
-			} else {
-				require.NotContains(t, body.Data.Config, "custom_code_dashboard")
-				require.NotContains(t, w.Body.String(), "private dashboard appearance")
-			}
+			// Login and member pages need the same appearance code as admin pages.
+			require.Equal(t, dashboardCode, body.Data.Config["custom_code_dashboard"])
 			if tc.user != nil {
 				require.Equal(t, "agent.example.invalid", body.Data.Config["install_host"])
 			} else {

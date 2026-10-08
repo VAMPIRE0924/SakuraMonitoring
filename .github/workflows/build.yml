@@ -61,7 +61,9 @@ jobs:
 
       - name: Verify backend
         working-directory: upstream/nezha
-        run: go test ./...
+        # Upstream workflow-policy tests require its own CI files, which are
+        # intentionally excluded from Sakura's public mirror.
+        run: go test ./cmd/... ./model/... ./pkg/... ./service/...
 
       - name: Build Linux dashboard
         shell: bash

@@ -110,7 +110,9 @@
 		"somethingWentWrong": "Etwas ist schiefgelaufen",
 		"backToHome": "Zurück zur Startseite",
 		"backendUnavailableTitle": "Backend-API nicht verfügbar",
-		"backendUnavailableDescription": "Die Seite ist weiterhin verfügbar, aber die Monitoring-Daten können vorübergehend nicht geladen werden."
+		"backendUnavailableDescription": "Die Seite ist weiterhin verfügbar, aber die Monitoring-Daten können vorübergehend nicht geladen werden.",
+		"loginRequiredTitle": "Login required",
+		"loginRequiredDescription": "This site requires a login to load monitoring data."
 	},
 	"whereTheTimeIs": "Wo die Zeit ist",
 	"greeting": {
@@ -134,7 +136,8 @@
 	},
 	"tabSwitch": {
 		"Network": "Netzwerk",
-		"Detail": "Detail"
+		"Detail": "Detail",
+		"Online": "Online"
 	},
 	"nezha": "Nezha Monitoring",
 	"dashboard": "Dashboard",
@@ -220,5 +223,32 @@
 	},
 	"group": {
 		"all": "Alle"
+	},
+	"serverOnlineHistory": {
+		"days1": "1 T",
+		"days7": "7 T",
+		"days30": "30 T",
+		"onlineRate": "Online-Anteil",
+		"totalOnline": "Online-Zeit gesamt",
+		"lastActive": "Zuletzt aktiv",
+		"dailyOnline": "Tägliche Online-Zeit",
+		"periods": "Online-Zeiträume",
+		"ongoing": "Laufend",
+		"noData": "Keine Online-Aufzeichnungen",
+		"loginRequired": "Für diesen Zeitraum ist eine Anmeldung erforderlich; Gäste können 1 Tag anzeigen",
+		"offlinePeriods": "Offline-Zeiträume",
+		"periodsOnline": "Online",
+		"periodsOffline": "Offline",
+		"expandMore": "Mehr anzeigen",
+		"today": "Heute",
+		"loadError": "Online-Verlauf konnte nicht geladen werden. Bitte erneut versuchen.",
+		"loading": "Online-Verlauf wird geladen",
+		"originalSession": "Ursprüngliche Sitzung",
+		"dataCutoffHint": "Markierung: Datenstand",
+		"dataCutoff": "Daten bis",
+		"notYetRecorded": "Noch nicht aufgezeichnet",
+		"outsideWindow": "Außerhalb des gewählten Zeitraums",
+		"totalOffline": "Offline-Zeit gesamt",
+		"retry": "Erneut versuchen"
 	}
 }

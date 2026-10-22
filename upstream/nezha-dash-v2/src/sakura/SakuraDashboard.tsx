@@ -31,7 +31,11 @@ import {
 	removeStoredItem,
 	setStoredItem,
 } from "@/lib/browser-storage";
-import { fetchServerGroup, fetchService } from "@/lib/nezha-api";
+import {
+	fetchServerGroup,
+	fetchService,
+	isUnauthorizedError,
+} from "@/lib/nezha-api";
 import { sortServerItems } from "@/lib/server-sort";
 import { getServiceNameForPanel } from "@/lib/service-visibility";
 import { cn } from "@/lib/utils";
@@ -446,11 +450,11 @@ export default function SakuraDashboard() {
 			void loadSakuraServicePanel().catch(() => undefined);
 		}
 	}, [showMap, showServices]);
-	const { data: groupData } = useQuery({
+	const { data: groupData, error: groupError } = useQuery({
 		queryKey: ["server-group"],
 		queryFn: ({ signal }) => fetchServerGroup(signal),
 	});
-	const { data: serviceData } = useQuery({
+	const { data: serviceData, error: serviceError } = useQuery({
 		queryKey: ["service"],
 		queryFn: ({ signal }) => fetchService(signal),
 		refetchInterval: 10000,
@@ -541,6 +545,20 @@ export default function SakuraDashboard() {
 		sortOrder,
 	).map(({ view }) => view);
 	const hasServers = allServerViews.length > 0;
+
+	if (
+		isUnauthorizedError(serviceError) ||
+		(!lastData && isUnauthorizedError(groupError))
+	) {
+		return (
+			<section className="sakura-state" role="status">
+				<ServerOff size={22} />
+				<strong>{t("error.loginRequiredTitle")}</strong>
+				<p>{t("error.loginRequiredDescription")}</p>
+				<a href="/dashboard">{t("login")}</a>
+			</section>
+		);
+	}
 
 	if (!lastData) {
 		if (connectionState !== "disconnected") {

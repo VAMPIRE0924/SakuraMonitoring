@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { ImageMinus, Languages, Moon, Search, Sun } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -57,6 +58,7 @@ function SakuraIconButton({
 }
 
 function SakuraHeader({ config }: { config: SakuraRuntimeConfig }) {
+	const queryClient = useQueryClient();
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const backgroundImage = config.backgroundImage || undefined;
@@ -76,11 +78,13 @@ function SakuraHeader({ config }: { config: SakuraRuntimeConfig }) {
 				previousLoginState.current !== null &&
 				previousLoginState.current !== isLogin
 			) {
+				// Online history may contain member-only 7/30-day windows.
+				void queryClient.resetQueries({ queryKey: ["online-history"] });
 				setNeedReconnect(true);
 			}
 			previousLoginState.current = isLogin;
 		}
-	}, [isLogin, isError, isFetched, setNeedReconnect]);
+	}, [isLogin, isError, isFetched, queryClient, setNeedReconnect]);
 
 	useEffect(() => {
 		document.title = config.title || "";

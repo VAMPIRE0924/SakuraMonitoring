@@ -5,6 +5,7 @@ import type {
 	MetricPeriod,
 	MetricType,
 	MonitorResponse,
+	OnlineHistoryResponse,
 	ServerGroupResponse,
 	ServerMetricsResponse,
 	ServiceData,
@@ -14,6 +15,16 @@ import type {
 
 let latestRefreshTokenAt = 0;
 let refreshTokenRequest: Promise<void> | null = null;
+
+export const API_ERROR_UNAUTHORIZED = "ApiErrorUnauthorized";
+
+export function isUnauthorizedError(error: unknown): boolean {
+	return (
+		(error instanceof Error && error.message === API_ERROR_UNAUTHORIZED) ||
+		(error instanceof NezhaApiError && error.status === 401) ||
+		error === API_ERROR_UNAUTHORIZED
+	);
+}
 
 export class NezhaApiError extends Error {
 	readonly status: number;
@@ -542,4 +553,91 @@ export const fetchServerMetrics = async (
 		: `?metric=${metric}`;
 	const url = `/api/v1/server/${server_id}/metrics${query}`;
 	return parseServerMetricsResponse(await fetchJsonWithSignal(url, signal));
+};
+
+function parseOnlineHistoryResponse(value: unknown): OnlineHistoryResponse {
+	const invalid = () => new Error("Invalid online history response");
+	const positiveInteger = (v: unknown) =>
+		typeof v === "number" && Number.isSafeInteger(v) && v > 0;
+	const nonNegative = (v: unknown) =>
+		typeof v === "number" && Number.isFinite(v) && v >= 0;
+	const timestamp = (v: unknown) =>
+		typeof v === "string" && Number.isFinite(Date.parse(v));
+	if (!isRecord(value) || value.success !== true || !isRecord(value.data)) {
+		throw invalid();
+	}
+	const d = value.data;
+	if (
+		!positiveInteger(d.server_id) ||
+		typeof d.server_name !== "string" ||
+		!positiveInteger(d.days) ||
+		!positiveInteger(d.max_days) ||
+		!timestamp(d.window_start) ||
+		!timestamp(d.window_end) ||
+		Date.parse(String(d.window_start)) > Date.parse(String(d.window_end)) ||
+		!nonNegative(d.total_online_seconds) ||
+		!nonNegative(d.online_rate) ||
+		Number(d.online_rate) > 100 ||
+		typeof d.currently_online !== "boolean" ||
+		(d.last_active != null && !timestamp(d.last_active)) ||
+		(d.timezone !== undefined && typeof d.timezone !== "string") ||
+		(d.tz_offset !== undefined && !Number.isFinite(d.tz_offset)) ||
+		!Array.isArray(d.periods) ||
+		!Array.isArray(d.daily)
+	) {
+		throw invalid();
+	}
+	if (d.timezone) {
+		try {
+			new Intl.DateTimeFormat("en", { timeZone: String(d.timezone) });
+		} catch {
+			throw invalid();
+		}
+	}
+	for (const p of d.periods) {
+		if (
+			!isRecord(p) ||
+			!timestamp(p.start) ||
+			!timestamp(p.end) ||
+			Date.parse(String(p.end)) < Date.parse(String(p.start)) ||
+			typeof p.ongoing !== "boolean"
+		)
+			throw invalid();
+	}
+	for (const day of d.daily) {
+		if (
+			!isRecord(day) ||
+			typeof day.date !== "string" ||
+			!/^\d{4}-\d{2}-\d{2}$/.test(day.date) ||
+			!timestamp(day.date) ||
+			!nonNegative(day.online_seconds)
+		)
+			throw invalid();
+	}
+	return value as unknown as OnlineHistoryResponse;
+}
+
+export const fetchServerOnlineHistory = async (
+	serverId: number,
+	days = 1,
+	signal?: AbortSignal,
+): Promise<OnlineHistoryResponse> => {
+	if (
+		!Number.isSafeInteger(serverId) ||
+		serverId <= 0 ||
+		!Number.isSafeInteger(days) ||
+		days < 1 ||
+		days > 3650
+	) {
+		throw new Error("Invalid online history request");
+	}
+	const result = parseOnlineHistoryResponse(
+		await fetchJson(`/api/v1/server/${serverId}/online-history?days=${days}`, {
+			cache: "no-store",
+			...(signal ? { signal } : {}),
+		}),
+	);
+	if (result.data.server_id !== serverId)
+		throw new Error("Invalid online history server");
+	return result;
 };

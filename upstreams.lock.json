@@ -2,17 +2,17 @@
   "backend": {
     "repository": "https://github.com/nezhahq/nezha.git",
     "branch": "master",
-    "commit": "9881c47f0cc92256ba203919da5a25fab79a6bad",
-    "version": "v2.3.18"
+    "commit": "a20c79b75ce4c04e59e2c9cd5fe6d4a55076eb5f",
+    "version": "v2.4.1"
   },
   "frontend": {
     "repository": "https://github.com/hamster1963/nezha-dash-v2.git",
     "branch": "main",
-    "commit": "74a52e8cb063587328988f0672bd729a4e703023",
-    "version": "v2.4.3"
+    "commit": "576e2307948ea6a12e4cc072039906ce801b23a2",
+    "version": "v2.5.1"
   },
   "toolchain": {
-    "go": "1.26.8",
+    "go": "1.26.10",
     "node": "24",
     "pnpm": "11.9.0"
   }

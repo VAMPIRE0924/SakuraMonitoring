@@ -53,8 +53,8 @@
 		"totalDownloadCard": "总下行",
 		"totalBandwidth": "总流量",
 		"speed": "速率",
-		"trafficRate": "\u7f51\u7edc\u901f\u7387",
-		"trafficTotal": "\u6d41\u91cf",
+		"trafficRate": "网络速率",
+		"trafficTotal": "流量",
 		"network": "网络"
 	},
 	"map": {
@@ -154,11 +154,14 @@
 		"somethingWentWrong": "出现错误",
 		"backToHome": "回到主页",
 		"backendUnavailableTitle": "后端 API 无法访问",
-		"backendUnavailableDescription": "页面仍会正常显示，但暂时无法加载监控数据。"
+		"backendUnavailableDescription": "页面仍会正常显示，但暂时无法加载监控数据。",
+		"loginRequiredTitle": "需要登录",
+		"loginRequiredDescription": "当前站点已开启强制登录，登录后即可加载监控数据。"
 	},
 	"tabSwitch": {
 		"Detail": "详情",
-		"Network": "网络"
+		"Network": "网络",
+		"Online": "在线"
 	},
 	"monitor": {
 		"noData": "没有服务监控数据，请在管理后台服务页添加监控任务",
@@ -222,5 +225,32 @@
 	},
 	"group": {
 		"all": "全部"
+	},
+	"serverOnlineHistory": {
+		"loading": "正在加载在线记录",
+		"originalSession": "原始会话",
+		"dataCutoffHint": "竖线：数据截止",
+		"dataCutoff": "数据截止",
+		"notYetRecorded": "尚未统计",
+		"outsideWindow": "未纳入统计",
+		"days1": "1 天",
+		"days7": "7 天",
+		"days30": "30 天",
+		"onlineRate": "在线率",
+		"totalOnline": "累计在线",
+		"totalOffline": "累计离线",
+		"lastActive": "最后活跃",
+		"dailyOnline": "每日在线时长",
+		"periods": "在线时间段",
+		"ongoing": "进行中",
+		"noData": "暂无在线记录",
+		"loginRequired": "当前窗口需要登录后查看，游客可切换到 1 天",
+		"offlinePeriods": "不在线时间段",
+		"periodsOnline": "在线",
+		"periodsOffline": "离线",
+		"expandMore": "展开更多",
+		"today": "今天",
+		"loadError": "无法加载在线历史，请稍后重试。",
+		"retry": "重试"
 	}
 }

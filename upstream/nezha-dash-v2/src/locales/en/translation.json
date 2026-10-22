@@ -160,11 +160,14 @@
 		"somethingWentWrong": "Something went wrong",
 		"backToHome": "Back to home",
 		"backendUnavailableTitle": "Backend API unavailable",
-		"backendUnavailableDescription": "The page is still available, but data cannot be loaded right now."
+		"backendUnavailableDescription": "The page is still available, but data cannot be loaded right now.",
+		"loginRequiredTitle": "Login required",
+		"loginRequiredDescription": "This site requires a login to load monitoring data."
 	},
 	"tabSwitch": {
 		"Detail": "Detail",
-		"Network": "Network"
+		"Network": "Network",
+		"Online": "Online"
 	},
 	"monitor": {
 		"noData": "No server monitor data, please add a service monitor first",
@@ -228,5 +231,32 @@
 	},
 	"group": {
 		"all": "All"
+	},
+	"serverOnlineHistory": {
+		"loading": "Loading online history",
+		"originalSession": "Original session",
+		"dataCutoffHint": "Marker: data cutoff",
+		"dataCutoff": "Data through",
+		"notYetRecorded": "Not yet recorded",
+		"outsideWindow": "Outside selected window",
+		"days1": "1d",
+		"days7": "7d",
+		"days30": "30d",
+		"onlineRate": "Online rate",
+		"totalOnline": "Total online",
+		"totalOffline": "Total offline",
+		"lastActive": "Last active",
+		"dailyOnline": "Daily online time",
+		"periods": "Online periods",
+		"ongoing": "Ongoing",
+		"noData": "No online records",
+		"loginRequired": "This window requires login; guests can switch to 1d",
+		"offlinePeriods": "Offline periods",
+		"periodsOnline": "Online",
+		"periodsOffline": "Offline",
+		"expandMore": "Expand more",
+		"today": "Today",
+		"loadError": "Unable to load online history. Please try again.",
+		"retry": "Retry"
 	}
 }

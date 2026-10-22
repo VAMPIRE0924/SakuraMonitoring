@@ -103,6 +103,17 @@
 		margin-top: 8px;
 		margin-bottom: 8px;
 	}
+
+	.sakura-online-card {
+		min-width: 0;
+		border-radius: 10px;
+		background: rgb(255 255 255 / 0.7);
+		box-shadow: none;
+	}
+
+	.dark .sakura-online-card {
+		background: rgb(23 23 23 / 0.7);
+	}
 }
 
 /*

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -111,6 +112,7 @@ func probe() error {
 	defer ws.Close()
 	ws.SetReadDeadline(time.Now().Add(40 * time.Second))
 	frames := make(chan int, 1)
+	serverIDs := make(chan uint64, 1)
 	go func() {
 		count := 0
 		for {
@@ -144,6 +146,10 @@ func probe() error {
 					continue
 				}
 				seen++
+				select {
+				case serverIDs <- server.ID:
+				default:
+				}
 				if server.LastActive.IsZero() || time.Since(server.LastActive) > 6*time.Second {
 					errors <- fmt.Errorf("agent %d became offline or stopped reporting", server.ID)
 					return
@@ -187,6 +193,37 @@ func probe() error {
 			return fmt.Errorf("insufficient websocket samples: %d", count)
 		}
 		fmt.Printf("Agent stream probe passed: two agents, 30 seconds, %d online/GPU websocket frames, no reconnects\n", count)
+		serverID := <-serverIDs
+		request, err := http.NewRequestWithContext(ctx, http.MethodGet,
+			fmt.Sprintf("http://%s/api/v1/server/%d/online-history?days=1", address, serverID), nil)
+		if err != nil {
+			return err
+		}
+		response, err := (&http.Client{Timeout: 5 * time.Second}).Do(request)
+		if err != nil {
+			return err
+		}
+		defer response.Body.Close()
+		var history struct {
+			Success bool `json:"success"`
+			Data    struct {
+				ServerID uint64 `json:"server_id"`
+				Days     int    `json:"days"`
+				Online   bool   `json:"currently_online"`
+				Periods  []struct {
+					Ongoing bool `json:"ongoing"`
+				} `json:"periods"`
+			} `json:"data"`
+		}
+		if err := json.NewDecoder(response.Body).Decode(&history); err != nil {
+			return err
+		}
+		if response.StatusCode != http.StatusOK || !history.Success || history.Data.ServerID != serverID ||
+			history.Data.Days != 1 || !history.Data.Online || len(history.Data.Periods) == 0 ||
+			!history.Data.Periods[len(history.Data.Periods)-1].Ongoing {
+			return fmt.Errorf("online history lost the live agent session")
+		}
+		fmt.Println("Online history probe passed: guest one-day window and ongoing agent session")
 	default:
 		return fmt.Errorf("no public websocket samples")
 	}

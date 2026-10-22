@@ -131,7 +131,8 @@
 	},
 	"tabSwitch": {
 		"Detail": "Detalle",
-		"Network": "Red"
+		"Network": "Red",
+		"Online": "Online"
 	},
 	"monitor": {
 		"avgDelay": "Latencia",
@@ -150,7 +151,9 @@
 		"somethingWentWrong": "Algo salió mal",
 		"backToHome": "Volver al Inicio",
 		"backendUnavailableTitle": "La API del servidor no está disponible",
-		"backendUnavailableDescription": "La página sigue disponible, pero los datos de monitorización no se pueden cargar temporalmente."
+		"backendUnavailableDescription": "La página sigue disponible, pero los datos de monitorización no se pueden cargar temporalmente.",
+		"loginRequiredTitle": "Login required",
+		"loginRequiredDescription": "This site requires a login to load monitoring data."
 	},
 	"theme": {
 		"system": "Sistema",
@@ -218,5 +221,32 @@
 			"up_total": "Subida total",
 			"down_total": "Bajada total"
 		}
+	},
+	"serverOnlineHistory": {
+		"days1": "1 d",
+		"days7": "7 d",
+		"days30": "30 d",
+		"onlineRate": "Porcentaje en línea",
+		"totalOnline": "Tiempo total en línea",
+		"lastActive": "Última actividad",
+		"dailyOnline": "Tiempo en línea por día",
+		"periods": "Períodos en línea",
+		"ongoing": "En curso",
+		"noData": "Sin registros de conexión",
+		"loginRequired": "Este período requiere iniciar sesión; los visitantes pueden consultar 1 día",
+		"offlinePeriods": "Períodos sin conexión",
+		"periodsOnline": "En línea",
+		"periodsOffline": "Sin conexión",
+		"expandMore": "Mostrar más",
+		"today": "Hoy",
+		"loadError": "No se pudo cargar el historial. Inténtalo de nuevo.",
+		"loading": "Cargando historial de conexión",
+		"originalSession": "Sesión original",
+		"dataCutoffHint": "Marcador: límite de datos",
+		"dataCutoff": "Datos hasta",
+		"notYetRecorded": "Aún sin registrar",
+		"outsideWindow": "Fuera del período seleccionado",
+		"totalOffline": "Tiempo total sin conexión",
+		"retry": "Reintentar"
 	}
 }

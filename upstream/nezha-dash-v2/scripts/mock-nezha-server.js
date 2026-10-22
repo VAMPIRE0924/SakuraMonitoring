@@ -426,6 +426,68 @@ function monitorResponse(serverId, period = "1d") {
 	};
 }
 
+// Local Demo only: deterministic online sessions; no production state is read.
+function onlineHistoryResponse(serverId, days = 1) {
+	const end = new Date();
+	const start = new Date(end);
+	start.setUTCHours(0, 0, 0, 0);
+	start.setUTCDate(start.getUTCDate() - days + 1);
+	const periods = [];
+	const daily = [];
+	const offline = serverId % 17 === 0;
+	const empty = serverId === 4;
+	for (let day = 0; day < days; day++) {
+		const midnight = start.getTime() + day * 86400000;
+		const stop = Math.min(midnight + 86400000, end.getTime());
+		let onlineSeconds = 0;
+		if (!empty) {
+			const span = stop - midnight;
+			for (const [index, [from, to]] of [
+				[0.04, 0.3],
+				[0.38, 0.65],
+				[0.72, offline ? 0.88 : 1],
+			].entries()) {
+				const a = midnight + Math.floor(span * from);
+				const b = midnight + Math.floor(span * to);
+				if (b <= a) continue;
+				periods.push({
+					start: new Date(a).toISOString(),
+					end: new Date(b).toISOString(),
+					ongoing: !offline && day === days - 1 && index === 2,
+				});
+				onlineSeconds += Math.floor((b - a) / 1000);
+			}
+		}
+		daily.push({
+			date: new Date(midnight).toISOString().slice(0, 10),
+			online_seconds: onlineSeconds,
+		});
+	}
+	const total = daily.reduce((sum, day) => sum + day.online_seconds, 0);
+	return {
+		success: true,
+		data: {
+			server_id: serverId,
+			server_name: servers[serverId - 1]?.name || `S-${serverId}`,
+			days,
+			max_days: 30,
+			timezone: "UTC",
+			tz_offset: 0,
+			window_start: start.toISOString(),
+			window_end: end.toISOString(),
+			total_online_seconds: total,
+			online_rate:
+				(total /
+					Math.max(1, Math.floor((end.getTime() - start.getTime()) / 1000))) *
+				100,
+			currently_online: !offline,
+			...(empty ? {} : { last_active: periods.at(-1)?.end }),
+			periods,
+			daily,
+		},
+	};
+}
+
 const httpServer = http.createServer((request, response) => {
 	const requestUrl = new URL(
 		request.url || "/",
@@ -442,14 +504,83 @@ const httpServer = http.createServer((request, response) => {
 		return;
 	}
 
+	const onlineMatch = requestUrl.pathname.match(
+		/^\/api\/v1\/server\/(\d+)\/online-history$/,
+	);
+	if (onlineMatch) {
+		const days = Number(requestUrl.searchParams.get("days") || 30);
+		if (!Number.isInteger(days) || days < 1) {
+			jsonResponse(response, { error: "invalid days parameter" });
+		} else if (
+			(process.env.NEZHA_MOCK_GUEST === "1" ||
+				request.headers.cookie?.includes("mock-guest=1")) &&
+			days > 1
+		) {
+			jsonResponse(response, {
+				error: "unauthorized: only 1d data available for guests",
+			});
+		} else {
+			jsonResponse(
+				response,
+				onlineHistoryResponse(Number(onlineMatch[1]), Math.min(30, days)),
+			);
+		}
+		return;
+	}
+
 	const monitorMatch = requestUrl.pathname.match(
-		/^\/api\/v1\/server\/(\d+)\/service$/,
+		/^\/api\/v1\/server\/(\d+)\/metrics$/,
 	);
 	if (monitorMatch) {
+		const id = Number(monitorMatch[1]);
+		const metric = requestUrl.searchParams.get("metric") || "cpu";
+		const days =
+			{ "1d": 1, "7d": 7, "30d": 30 }[
+				requestUrl.searchParams.get("period") || "1d"
+			] || 1;
+		const base =
+			{
+				cpu: 45,
+				memory: 34,
+				swap: 8,
+				disk: 28,
+				gpu: 25,
+				net_in_speed: 48000,
+				net_out_speed: 64000,
+				net_in_transfer: 2 ** 30,
+				net_out_transfer: 2 ** 30,
+				load1: 0.7,
+				load5: 0.5,
+				load15: 0.3,
+				tcp_conn: 20,
+				udp_conn: 8,
+				process_count: 100,
+				uptime: 3600,
+			}[metric] || 0;
+		const now = Date.now();
+		jsonResponse(response, {
+			success: true,
+			data: {
+				server_id: id,
+				server_name: servers[id - 1]?.name || `S-${id}`,
+				metric,
+				data_points: Array.from({ length: 120 }, (_, index) => ({
+					ts: now - ((119 - index) * days * 86400000) / 120,
+					value: base * (0.8 + (Math.sin(index / 7 + id) + 1) * 0.2),
+				})),
+			},
+		});
+		return;
+	}
+
+	const serviceMatch = requestUrl.pathname.match(
+		/^\/api\/v1\/server\/(\d+)\/service$/,
+	);
+	if (serviceMatch) {
 		jsonResponse(
 			response,
 			monitorResponse(
-				Number(monitorMatch[1]),
+				Number(serviceMatch[1]),
 				requestUrl.searchParams.get("period") || "1d",
 			),
 		);
@@ -482,6 +613,10 @@ const httpServer = http.createServer((request, response) => {
 			});
 			return;
 		case "/api/v1/profile":
+			if (process.env.NEZHA_MOCK_GUEST === "1") {
+				jsonResponse(response, { error: "ApiErrorUnauthorized" });
+				return;
+			}
 			jsonResponse(response, {
 				success: true,
 				data: {

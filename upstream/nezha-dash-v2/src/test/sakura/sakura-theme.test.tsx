@@ -28,7 +28,8 @@ const apiMocks = vi.hoisted(() => ({
 	fetchLoginUser: vi.fn(),
 }));
 
-vi.mock("@/lib/nezha-api", () => ({
+vi.mock("@/lib/nezha-api", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@/lib/nezha-api")>()),
 	...apiMocks,
 	isAuthenticatedProfile: (
 		profile: { success: boolean; data: { id: number } } | undefined,
@@ -154,6 +155,33 @@ function expectVisibleListServerName(container: HTMLElement, name: string) {
 }
 
 describe("Sakura independent theme", () => {
+	it("prompts login instead of reporting a broken connection when public data requires auth", async () => {
+		apiMocks.fetchServerGroup.mockRejectedValue(
+			new Error("ApiErrorUnauthorized"),
+		);
+		renderSakura(<SakuraDashboard />, "/", null, "disconnected");
+		expect(
+			await screen.findByText("error.loginRequiredTitle"),
+		).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "login" })).toHaveAttribute(
+			"href",
+			"/dashboard",
+		);
+		expect(
+			screen.queryByText("info.websocketDisconnected"),
+		).not.toBeInTheDocument();
+	});
+
+	it("keeps authenticated live data visible when guest-scoped groups require auth", async () => {
+		apiMocks.fetchServerGroup.mockRejectedValue(
+			new Error("ApiErrorUnauthorized"),
+		);
+		renderSakura(<SakuraDashboard />);
+		expect(await screen.findByText("edge-online")).toBeInTheDocument();
+		expect(
+			screen.queryByText("error.loginRequiredTitle"),
+		).not.toBeInTheDocument();
+	});
 	it("distinguishes the initial WebSocket handshake from a real disconnection", () => {
 		const connecting = renderSakura(
 			<SakuraDashboard />,

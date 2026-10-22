@@ -2,7 +2,7 @@
 
 Sakura Monitoring 是面向哪吒监控的独立前台主题。主题直接使用哪吒官方 API、WebSocket、路由和数据类型，并与 Dashboard 后端一起编译进 Linux 二进制文件。
 
-当前适配基线记录在 `upstreams.lock.json`：哪吒后端 `v2.3.18`，官方前端契约 `v2.4.3`；Sakura 保持独立主题实现。
+当前适配基线记录在 `upstreams.lock.json`：哪吒后端 `v2.4.1`，官方前端契约 `v2.5.1`；Sakura 保持独立主题实现。
 
 ## macOS 初始化与验证
 
@@ -15,7 +15,7 @@ Sakura Monitoring 是面向哪吒监控的独立前台主题。主题直接使�
 
 正式 Linux `amd64` 与 `arm64` 包由 `.github/workflows/build.yml` 构建和验证；`v*` 标签会创建 GitHub Release。
 
-构建工具链锁定为 Go `1.26.8`，与官方 `v2.3.18` 发布使用的版本一致。发布验证包含旧、新 Agent 的持续上报、任务连接、WebSocket 在线状态和 GPU 显存契约检查。
+官方 `v2.4.1` 使用 Go `1.26.9`；本项目经授权将工具链锁定为安全修复版 Go `1.26.10`，并最小更新 `golang.org/x/net` 修复已知漏洞，官方业务源码保持一致。发布验证包含旧、新 Agent 的持续上报、任务连接、WebSocket 在线状态、GPU 显存和在线历史契约检查。
 
 ## 升级
 

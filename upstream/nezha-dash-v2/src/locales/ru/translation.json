@@ -55,7 +55,8 @@
 	},
 	"tabSwitch": {
 		"Detail": "Детали",
-		"Network": "Сеть"
+		"Network": "Сеть",
+		"Online": "Online"
 	},
 	"whereTheTimeIs": "Где время",
 	"greeting": {
@@ -184,7 +185,9 @@
 		"somethingWentWrong": "Что-то пошло не так",
 		"backToHome": "Вернуться на главную",
 		"backendUnavailableTitle": "API сервера недоступен",
-		"backendUnavailableDescription": "Страница доступна, но данные мониторинга временно не загружаются."
+		"backendUnavailableDescription": "Страница доступна, но данные мониторинга временно не загружаются.",
+		"loginRequiredTitle": "Login required",
+		"loginRequiredDescription": "This site requires a login to load monitoring data."
 	},
 	"ToggleDarkMode": "Переключить на темную тему",
 	"Shortcuts": "Горячие клавиши",
@@ -218,5 +221,32 @@
 			"up_total": "Всего вверх",
 			"down_total": "Всего вниз"
 		}
+	},
+	"serverOnlineHistory": {
+		"days1": "1 д",
+		"days7": "7 д",
+		"days30": "30 д",
+		"onlineRate": "Доля времени онлайн",
+		"totalOnline": "Всего онлайн",
+		"lastActive": "Последняя активность",
+		"dailyOnline": "Время онлайн по дням",
+		"periods": "Периоды онлайн",
+		"ongoing": "Продолжается",
+		"noData": "Нет записей доступности",
+		"loginRequired": "Для этого периода нужен вход; гостям доступен 1 день",
+		"offlinePeriods": "Периоды офлайн",
+		"periodsOnline": "Онлайн",
+		"periodsOffline": "Офлайн",
+		"expandMore": "Показать ещё",
+		"today": "Сегодня",
+		"loadError": "Не удалось загрузить историю. Повторите попытку.",
+		"loading": "Загрузка истории доступности",
+		"originalSession": "Исходный сеанс",
+		"dataCutoffHint": "Метка: граница данных",
+		"dataCutoff": "Данные по",
+		"notYetRecorded": "Ещё не записано",
+		"outsideWindow": "Вне выбранного периода",
+		"totalOffline": "Всего офлайн",
+		"retry": "Повторить"
 	}
 }

@@ -9,8 +9,10 @@ Nezha dashboard:
 nezha-dash-v2:
   https://github.com/hamster1963/nezha-dash-v2
 
-The upstream source directories retain their original Apache License 2.0
-license files. Upstream commit pins are recorded in upstreams.lock.json.
+Nezha v2.6.1 is distributed under WTFPL v2 (upstream/nezha/LICENSE).
+nezha-dash-v2 retains its Apache License 2.0 license file.
+Sakura modifications retain the root Apache License 2.0.
+Upstream commit pins are recorded in upstreams.lock.json.
 
 ISO TopoJSON:
   https://github.com/rembish/iso-topojson

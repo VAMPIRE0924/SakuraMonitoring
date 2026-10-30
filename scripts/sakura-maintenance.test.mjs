@@ -55,3 +55,12 @@ test("requires Sakura in the release source", (t) => {
 	const { root } = fixture(t, allowed.slice(0, 2));
 	assert.equal(run(root).status, 1);
 });
+
+test("rejects runtime stores that could restore or install external themes", (t) => {
+	const { root } = fixture(t, allowed);
+	const configPath = path.join(root, "service/singleton/config.go");
+	fs.writeFileSync(configPath, "FrontendStore: frontend.NewStore(root, templates)");
+	assert.equal(run(root).status, 1);
+	fs.writeFileSync(configPath, "FrontendStore: frontend.NewBuiltinStore(root, templates)");
+	assert.equal(run(root).status, 0);
+});

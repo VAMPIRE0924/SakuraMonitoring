@@ -92,6 +92,13 @@ function enforceThemeBoundary(backendRoot, prune, requireSakura) {
 	if (finalPaths.some((templatePath) => !allowed.has(templatePath))) {
 		fail("Frontend theme boundary enforcement failed.");
 	}
+	const configPath = path.join(backendRoot, "service", "singleton", "config.go");
+	if (requireSakura && fs.existsSync(configPath)) {
+		const config = fs.readFileSync(configPath, "utf8");
+		if (config.includes("FrontendStore") && !config.includes("frontend.NewBuiltinStore(")) {
+			fail("Sakura runtime frontend storage must use the builtin-only registry.");
+		}
+	}
 	console.log(`Frontend theme boundary passed: ${finalPaths.join(", ")}`);
 }
 

@@ -590,12 +590,7 @@ export default function SakuraDashboard() {
 		...(showMap ? (["globe"] as const) : []),
 		...(showServices ? (["service"] as const) : []),
 	];
-	const loadingPanelLabel =
-		showMap && showServices
-			? t("info.loadingGlobeAndServiceResources")
-			: showMap
-				? t("info.loadingGlobeResources")
-				: t("info.loadingServiceResources");
+	const loadingPanelLabel = t("info.loadingServiceResources");
 	return (
 		<div className="sakura-dashboard">
 			<SakuraHeaderTimer />

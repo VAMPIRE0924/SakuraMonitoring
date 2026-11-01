@@ -17,6 +17,7 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import HistoryPeriodSelector from "@/components/HistoryPeriodSelector";
 import {
 	ServerTimelineChart,
 	ServerTimelineProvider,
@@ -24,13 +25,6 @@ import {
 } from "@/components/ServerTimelineChart";
 import { Card, CardContent } from "@/components/ui/card";
 import { type ChartConfig, ChartTooltipContent } from "@/components/ui/chart";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useActiveIndicator } from "@/hooks/use-active-indicator";
 import { useLoginProfile } from "@/hooks/use-login-profile";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { fetchServerMetrics, fetchSetting } from "@/lib/nezha-api";
@@ -305,97 +299,35 @@ function PeriodSelector({
 		],
 		[t],
 	);
-	const periodValues = useMemo(
-		() => periods.map((period) => period.value),
-		[periods],
-	);
-	const { containerRef, enableIndicatorAnimation, indicator, setItemRef } =
-		useActiveIndicator(periodValues, selectedPeriod);
-
 	return (
-		<TooltipProvider delayDuration={120}>
-			<div
-				ref={containerRef}
-				className="relative flex gap-0.5 mb-3 flex-wrap sm:-mt-5 -mt-3 p-0.5 bg-muted dark:bg-muted/40 rounded-full w-fit border border-border/60 dark:border-border"
-			>
-				{indicator && (
-					<div
-						className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
-						style={{
-							height: indicator.height,
-							transform: `translate(${indicator.x}px, ${indicator.y}px)`,
-							transition: indicator.shouldAnimate
-								? "transform 0.5s var(--timing), width 0.5s var(--timing), height 0.5s var(--timing)"
-								: "none",
-							width: indicator.width,
-						}}
-					/>
-				)}
-				{periods.map((period, index) => {
-					const isHistoryPeriod = period.value !== "realtime";
-					const isLockedByTsdb = !isTsdbEnabled && isHistoryPeriod;
-					// Only realtime and 1d are available for non-logged-in users
-					const isLockedByLogin =
-						!isLockedByTsdb &&
-						!isLogin &&
-						period.value !== "realtime" &&
-						period.value !== "1d";
-					const isLocked = isLockedByTsdb || isLockedByLogin;
-
-					const periodItem = (
-						<button
-							key={period.value}
-							type="button"
-							disabled={isLocked}
-							ref={setItemRef(index)}
-							onClick={() => {
-								if (selectedPeriod !== period.value) {
-									enableIndicatorAnimation();
-								}
-								onPeriodChange(period.value);
-							}}
-							className={cn(
-								"relative cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-300",
-								selectedPeriod === period.value
-									? "text-foreground"
-									: "text-muted-foreground hover:text-foreground",
-								isLocked && "cursor-not-allowed opacity-40 grayscale",
+		<HistoryPeriodSelector
+			className="mb-3 sm:-mt-5 -mt-3"
+			selectedPeriod={selectedPeriod}
+			onPeriodChange={onPeriodChange}
+			options={periods.map((period) => {
+				const isLockedByTsdb = !isTsdbEnabled && period.value !== "realtime";
+				const isLockedByLogin =
+					!isLogin && period.value !== "realtime" && period.value !== "1d";
+				return {
+					value: period.value,
+					label: (
+						<>
+							{period.value === "realtime" && (
+								<span className="inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 dark:bg-emerald-400" />
 							)}
-						>
-							<span className="relative z-20 flex items-center gap-1.5">
-								{period.value === "realtime" && (
-									<span className="inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 dark:bg-emerald-400"></span>
-								)}
-								{period.label}
-							</span>
-						</button>
-					);
-
-					if (isLockedByTsdb || isLockedByLogin) {
-						return (
-							<Tooltip key={period.value}>
-								<TooltipTrigger asChild>
-									<span className="inline-flex">{periodItem}</span>
-								</TooltipTrigger>
-								<TooltipContent>
-									{isLockedByTsdb
-										? t(
-												"serverDetailChart.tsdbRequired",
-												"Enable TSDB to use historical data",
-											)
-										: t(
-												"serverDetailChart.loginRequired",
-												"Please login to view",
-											)}
-								</TooltipContent>
-							</Tooltip>
-						);
-					}
-
-					return periodItem;
-				})}
-			</div>
-		</TooltipProvider>
+							{period.label}
+						</>
+					),
+					disabled: isLockedByTsdb || isLockedByLogin,
+					disabledHint: isLockedByTsdb
+						? t(
+								"serverDetailChart.tsdbRequired",
+								"Enable TSDB to use historical data",
+							)
+						: t("serverDetailChart.loginRequired", "Please login to view"),
+				};
+			})}
+		/>
 	);
 }
 

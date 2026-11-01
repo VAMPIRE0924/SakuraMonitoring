@@ -1,7 +1,8 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import HistoryPeriodSelector from "@/components/HistoryPeriodSelector";
 import OnlineHistorySkeleton from "@/components/loading/OnlineHistorySkeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,6 +12,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
+import { useLoginProfile } from "@/hooks/use-login-profile";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useSakuraRuntimeConfig } from "@/hooks/use-sakura-config";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
@@ -115,69 +117,30 @@ function WindowShade({
 }
 
 function DaysSelector({
+	isLogin,
 	selectedDays,
 	maxDays,
 	onDaysChange,
 }: {
+	isLogin: boolean;
 	selectedDays: number;
 	maxDays: number;
 	onDaysChange: (days: number) => void;
 }) {
 	const { t } = useTranslation();
-	const { containerRef, enableIndicatorAnimation, indicator, setItemRef } =
-		useActiveIndicator<number>(DAY_OPTIONS, selectedDays);
-
 	return (
-		<div
-			ref={containerRef}
-			data-testid="days-selector"
-			className="relative flex gap-0.5 flex-wrap p-0.5 bg-muted dark:bg-muted/40 rounded-full w-fit border border-border/60 dark:border-border"
-		>
-			{indicator && (
-				<div
-					className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
-					style={{
-						height: indicator.height,
-						transform: `translate(${indicator.x}px, ${indicator.y}px)`,
-						transition: indicator.shouldAnimate
-							? "transform 0.5s var(--timing), width 0.5s var(--timing), height 0.5s var(--timing)"
-							: "none",
-						width: indicator.width,
-					}}
-				/>
-			)}
-			{DAY_OPTIONS.map((days, index) => {
-				const isLocked = days > maxDays;
-				return (
-					<button
-						key={days}
-						type="button"
-						disabled={isLocked}
-						aria-pressed={selectedDays === days}
-						ref={setItemRef(index)}
-						onClick={() => {
-							if (!isLocked) {
-								if (selectedDays !== days) {
-									enableIndicatorAnimation();
-								}
-								onDaysChange(days);
-							}
-						}}
-						className={cn(
-							"relative z-20 cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-300",
-							selectedDays === days
-								? "text-foreground"
-								: "text-muted-foreground hover:text-foreground",
-							isLocked && "cursor-not-allowed opacity-40 grayscale",
-						)}
-					>
-						<p className="whitespace-nowrap">
-							{t(`serverOnlineHistory.days${days}`)}
-						</p>
-					</button>
-				);
-			})}
-		</div>
+		<HistoryPeriodSelector
+			testId="days-selector"
+			selectedPeriod={selectedDays}
+			onPeriodChange={onDaysChange}
+			options={DAY_OPTIONS.map((days) => ({
+				value: days,
+				label: t(`serverOnlineHistory.days${days}`),
+				disabled: days > maxDays,
+				disabledHint:
+					!isLogin && days > 1 ? t("monitor.loginRequired") : undefined,
+			}))}
+		/>
 	);
 }
 
@@ -249,6 +212,27 @@ export default function ServerDetailOnlineHistory({
 }: {
 	server_id: string;
 }) {
+	const { isLogin, data } = useLoginProfile();
+	const identity = isLogin ? String(data?.data.id) : "guest";
+	return (
+		<OnlineHistoryContent
+			key={`${server_id}:${identity}`}
+			server_id={server_id}
+			isLogin={isLogin}
+			identity={identity}
+		/>
+	);
+}
+
+function OnlineHistoryContent({
+	server_id,
+	isLogin,
+	identity,
+}: {
+	server_id: string;
+	isLogin: boolean;
+	identity: string;
+}) {
 	const { t } = useTranslation();
 	const { lastData } = useWebSocketContext();
 	const [days, setDays] = useState(DAY_OPTIONS[0]);
@@ -267,9 +251,9 @@ export default function ServerDetailOnlineHistory({
 		refetch,
 		isFetching,
 	} = useQuery({
-		queryKey: ["online-history", server_id, days],
+		queryKey: ["online-history", server_id, days, identity],
 		queryFn: ({ signal }) =>
-			fetchServerOnlineHistory(Number(server_id), days, signal),
+			fetchServerOnlineHistory(Number(server_id), isLogin ? days : 1, signal),
 		retry: (failures, error) =>
 			failures < 1 &&
 			!(
@@ -278,7 +262,13 @@ export default function ServerDetailOnlineHistory({
 					error.message === "ApiErrorUnauthorized" ||
 					("status" in error && error.status === 401))
 			),
-		placeholderData: keepPreviousData,
+		// Keep previous windows only within the same authenticated identity and host.
+		placeholderData: (previousData, previousQuery) =>
+			isLogin &&
+			previousQuery?.queryKey[1] === server_id &&
+			previousQuery?.queryKey[3] === identity
+				? previousData
+				: undefined,
 		refetchOnMount: true,
 		refetchOnWindowFocus: true,
 		refetchInterval: 60000,
@@ -390,8 +380,11 @@ export default function ServerDetailOnlineHistory({
 					</span>
 				)}
 				<DaysSelector
+					isLogin={isLogin}
 					selectedDays={days}
-					maxDays={guestMaxDays ?? online?.max_days ?? DAY_OPTIONS[2]}
+					maxDays={
+						isLogin ? (guestMaxDays ?? online?.max_days ?? DAY_OPTIONS[2]) : 1
+					}
 					onDaysChange={(nextDays) => {
 						setDays(nextDays);
 						setVisibleDays(PERIODS_INITIAL_DAYS);

@@ -11,6 +11,7 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import HistoryPeriodSelector from "@/components/HistoryPeriodSelector";
 import {
 	ServerTimelineChart,
 	ServerTimelineProvider,
@@ -29,13 +30,6 @@ import {
 	ChartLegendContent,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useActiveIndicator } from "@/hooks/use-active-indicator";
 import { useLoginProfile } from "@/hooks/use-login-profile";
 import { useSakuraRuntimeConfig } from "@/hooks/use-sakura-config";
 import { fetchMonitor, type MonitorPeriod } from "@/lib/nezha-api";
@@ -330,12 +324,6 @@ export const NetworkChartClient = React.memo(function NetworkChartClient({
 		],
 		[t],
 	);
-	const timeRangeValues = useMemo(
-		() => TIME_RANGE_OPTIONS.map((option) => option.value),
-		[TIME_RANGE_OPTIONS],
-	);
-	const { containerRef, enableIndicatorAnimation, indicator, setItemRef } =
-		useActiveIndicator(timeRangeValues, period);
 
 	React.useEffect(() => {
 		let timeoutId: number | undefined;
@@ -604,68 +592,16 @@ export const NetworkChartClient = React.memo(function NetworkChartClient({
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="flex items-center gap-3 sm:-mt-5 -mt-3 flex-wrap">
-				<TooltipProvider delayDuration={120}>
-					<div
-						ref={containerRef}
-						className="relative flex items-center gap-1 rounded-full bg-muted dark:bg-muted/40 p-0.5 border border-border/60 dark:border-border"
-					>
-						{indicator && (
-							<div
-								className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
-								style={{
-									height: indicator.height,
-									transform: `translate(${indicator.x}px, ${indicator.y}px)`,
-									transition: indicator.shouldAnimate
-										? "transform 0.5s var(--timing), width 0.5s var(--timing), height 0.5s var(--timing)"
-										: "none",
-									width: indicator.width,
-								}}
-							/>
-						)}
-						{TIME_RANGE_OPTIONS.map((option, index) => {
-							const isLocked = !isLogin && option.value !== "1d";
-							const optionItem = (
-								<button
-									type="button"
-									disabled={isLocked}
-									ref={setItemRef(index)}
-									onClick={() => {
-										if (period !== option.value) {
-											enableIndicatorAnimation();
-										}
-										onPeriodChange(option.value);
-									}}
-									className={cn(
-										"relative cursor-pointer appearance-none rounded-full border-0 bg-transparent px-3 py-1.5 text-xs font-medium transition-colors duration-300",
-										period === option.value
-											? "text-foreground"
-											: "text-muted-foreground hover:text-foreground",
-										isLocked && "cursor-not-allowed opacity-40 grayscale",
-									)}
-								>
-									<span className="relative z-20">{option.label}</span>
-								</button>
-							);
-
-							if (isLocked) {
-								return (
-									<Tooltip key={option.value}>
-										<TooltipTrigger asChild>
-											<span className="inline-flex">{optionItem}</span>
-										</TooltipTrigger>
-										<TooltipContent>
-											{t("monitor.loginRequired", "Please login to view")}
-										</TooltipContent>
-									</Tooltip>
-								);
-							}
-
-							return (
-								<React.Fragment key={option.value}>{optionItem}</React.Fragment>
-							);
-						})}
-					</div>
-				</TooltipProvider>
+				<HistoryPeriodSelector
+					className="items-center gap-1"
+					selectedPeriod={period}
+					onPeriodChange={onPeriodChange}
+					options={TIME_RANGE_OPTIONS.map((option) => ({
+						...option,
+						disabled: !isLogin && option.value !== "1d",
+						disabledHint: t("monitor.loginRequired", "Please login to view"),
+					}))}
+				/>
 				<div className="flex items-center space-x-2">
 					<Switch
 						id="Peak"

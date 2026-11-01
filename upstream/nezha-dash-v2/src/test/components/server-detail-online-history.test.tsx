@@ -8,6 +8,14 @@ import ServerDetailOnlineHistory from "@/components/ServerDetailOnlineHistory";
 import { createTestQueryClient } from "@/test/utils";
 import type { OnlineHistoryResponse } from "@/types/nezha-api";
 
+const loginMocks = vi.hoisted(() => ({
+	isLogin: true,
+	data: { success: true, data: { id: 42 } },
+}));
+vi.mock("@/hooks/use-login-profile", () => ({
+	useLoginProfile: () => loginMocks,
+}));
+
 const websocketMocks = vi.hoisted(() => ({
 	lastData: null as { servers: { id: number; last_active: string }[] } | null,
 }));
@@ -70,8 +78,92 @@ function renderWithQuery(ui: ReactElement) {
 
 describe("ServerDetailOnlineHistory", () => {
 	beforeEach(() => {
+		loginMocks.isLogin = true;
+		loginMocks.data.data.id = 42;
 		websocketMocks.lastData = null;
 		apiMocks.fetchServerOnlineHistory.mockReset();
+	});
+
+	it("locks guest windows on first render regardless of retention and explains on hover", async () => {
+		loginMocks.isLogin = false;
+		const response = onlineHistoryResponse(7);
+		response.data.days = 1;
+		apiMocks.fetchServerOnlineHistory.mockResolvedValue(response);
+		renderWithQuery(<ServerDetailOnlineHistory server_id="7" />);
+		await screen.findByText("serverOnlineHistory.dailyOnline");
+		const seven = screen.getByRole("button", {
+			name: "serverOnlineHistory.days7",
+		});
+		const thirty = screen.getByRole("button", {
+			name: "serverOnlineHistory.days30",
+		});
+		expect(seven).toBeDisabled();
+		expect(thirty).toBeDisabled();
+		expect(seven).toHaveClass("opacity-40");
+		const user = userEvent.setup();
+		await user.hover(seven.parentElement as HTMLElement);
+		expect(await screen.findByRole("tooltip")).toHaveTextContent(
+			"monitor.loginRequired",
+		);
+		await user.click(seven);
+		await user.click(thirty);
+		expect(apiMocks.fetchServerOnlineHistory).toHaveBeenCalledTimes(1);
+		expect(apiMocks.fetchServerOnlineHistory).toHaveBeenCalledWith(7, 1);
+	});
+
+	it("isolates history on logout and restores member access after login", async () => {
+		const client = createTestQueryClient();
+		const tree = () => (
+			<QueryClientProvider client={client}>
+				<ServerDetailOnlineHistory server_id="7" />
+			</QueryClientProvider>
+		);
+		apiMocks.fetchServerOnlineHistory.mockResolvedValue(
+			onlineHistoryResponse(7),
+		);
+		const view = render(tree());
+		await screen.findByText("serverOnlineHistory.dailyOnline");
+		await userEvent
+			.setup()
+			.click(screen.getByRole("button", { name: "serverOnlineHistory.days7" }));
+		await waitFor(() =>
+			expect(apiMocks.fetchServerOnlineHistory).toHaveBeenLastCalledWith(7, 7),
+		);
+		let resolveGuest!: (value: OnlineHistoryResponse) => void;
+		apiMocks.fetchServerOnlineHistory.mockReturnValue(
+			new Promise<OnlineHistoryResponse>((resolve) => {
+				resolveGuest = resolve;
+			}),
+		);
+		loginMocks.isLogin = false;
+		view.rerender(tree());
+		expect(screen.getByTestId("online-history-loading")).toBeInTheDocument();
+		expect(
+			screen.queryByText("serverOnlineHistory.dailyOnline"),
+		).not.toBeInTheDocument();
+		expect(apiMocks.fetchServerOnlineHistory).toHaveBeenLastCalledWith(7, 1);
+		const guest = onlineHistoryResponse(7);
+		guest.data.days = 1;
+		resolveGuest(guest);
+		await screen.findByText("serverOnlineHistory.dailyOnline");
+		expect(
+			screen.getByRole("button", { name: "serverOnlineHistory.days7" }),
+		).toBeDisabled();
+		apiMocks.fetchServerOnlineHistory.mockResolvedValue(
+			onlineHistoryResponse(7),
+		);
+		loginMocks.isLogin = true;
+		view.rerender(tree());
+		await screen.findByText("serverOnlineHistory.dailyOnline");
+		expect(
+			screen.getByRole("button", { name: "serverOnlineHistory.days7" }),
+		).toBeEnabled();
+		expect(
+			screen.getByRole("button", { name: "serverOnlineHistory.days30" }),
+		).toBeDisabled();
+		expect(
+			screen.getByRole("button", { name: "serverOnlineHistory.days1" }),
+		).toHaveAttribute("aria-pressed", "true");
 	});
 
 	it("shows a retryable load error instead of claiming a network failure needs login", async () => {

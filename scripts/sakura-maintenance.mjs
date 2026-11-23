@@ -38,13 +38,14 @@ function parseRegistry(registryPath) {
 }
 
 function enforceThemeBoundary(backendRoot, prune, requireSakura) {
-	const allowed = new Set(["admin-dist", "user-dist", "sakura-user-dist"]);
+	const allowed = new Set(["admin-dist", "user-dist", "sakura-user-dist", "sakura-admin-dist"]);
 	const expectedNames = new Map([
 		["admin-dist", "OfficialAdmin"],
 		["user-dist", "Official"],
 		["sakura-user-dist", "Sakura"],
+		["sakura-admin-dist", "Sakura"],
 	]);
-	const required = ["admin-dist", "user-dist", ...(requireSakura ? ["sakura-user-dist"] : [])];
+	const required = ["admin-dist", "user-dist", ...(requireSakura ? ["sakura-user-dist", "sakura-admin-dist"] : [])];
 	const registryPath = path.join(backendRoot, "service", "singleton", "frontend-templates.yaml");
 	const dashboardRoot = path.join(backendRoot, "cmd", "dashboard");
 	if (!fs.existsSync(registryPath)) fail(`Frontend template registry not found: ${registryPath}`);
@@ -56,6 +57,12 @@ function enforceThemeBoundary(backendRoot, prune, requireSakura) {
 		if (seen.has(block.path)) fail(`Duplicate frontend template path: ${block.path}`);
 		if (allowed.has(block.path) && block.name !== expectedNames.get(block.path)) {
 			fail(`Unexpected frontend template name for ${block.path}: ${block.name}`);
+		}
+		if (allowed.has(block.path)) {
+			const isAdmin = /^\s*is_admin:\s*true\s*$/m.test(block.text);
+			if (isAdmin !== ["admin-dist", "sakura-admin-dist"].includes(block.path)) {
+				fail(`Unexpected frontend role for ${block.path}`);
+			}
 		}
 		seen.add(block.path);
 	}
@@ -134,6 +141,7 @@ function checkTemplate(workspaceRoot) {
 		[registryPath, "Frontend template registry"],
 		[dashboardMain, "Dashboard main.go"],
 		[indexPath, "Sakura template index"],
+		[path.join(backendRoot, "cmd/dashboard/sakura-admin-dist/index.html"), "Sakura admin template index"],
 		[path.join(adminDist, "index.html"), "Official admin template index"],
 		[path.join(userDist, "index.html"), "Official user template index"],
 	]) {

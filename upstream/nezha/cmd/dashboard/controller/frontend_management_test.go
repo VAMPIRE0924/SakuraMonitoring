@@ -69,7 +69,7 @@ func TestSakuraProductionFrontendBoundary(t *testing.T) {
 	var catalog model.CommonResponse[frontendStatus]
 	require.NoError(t, json.Unmarshal(status.Body.Bytes(), &catalog))
 	require.True(t, catalog.Success)
-	require.Len(t, catalog.Data.Templates, 3)
+	require.Len(t, catalog.Data.Templates, 4)
 	for _, endpoint := range []struct{ path, body string }{
 		{"install", `{"repository":"https://github.com/example/theme","tag":"v1"}`},
 		{"activate", `{"path":"installed-user"}`},
@@ -88,6 +88,16 @@ func TestSakuraProductionFrontendBoundary(t *testing.T) {
 	user, admin := singleton.Conf.FrontendSelection()
 	require.Equal(t, "sakura-user-dist", user)
 	require.Equal(t, "admin-dist", admin)
+	for _, target := range []string{"sakura-admin-dist", "admin-dist"} {
+		response = frontendManagementRequest(t, router, "POST", "/api/v1/frontend/activate", `{"path":"`+target+`","is_admin":true}`)
+		var activated model.CommonResponse[any]
+		require.NoError(t, json.Unmarshal(response.Body.Bytes(), &activated))
+		require.True(t, activated.Success, response.Body.String())
+		require.NoError(t, singleton.InitConfigFromPath(configPath))
+		user, admin = singleton.Conf.FrontendSelection()
+		require.Equal(t, "sakura-user-dist", user)
+		require.Equal(t, target, admin)
+	}
 	require.FileExists(t, filepath.Join(filepath.Dir(configPath), "frontends/installed-user/dist/index.html"))
 }
 

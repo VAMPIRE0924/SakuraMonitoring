@@ -11,6 +11,7 @@ const allowed = [
 	["admin-dist", "OfficialAdmin"],
 	["user-dist", "Official"],
 	["sakura-user-dist", "Sakura"],
+	["sakura-admin-dist", "Sakura"],
 ];
 
 function fixture(t, templates) {
@@ -22,7 +23,7 @@ function fixture(t, templates) {
 		fs.mkdirSync(path.join(root, "cmd/dashboard", directory), { recursive: true });
 	}
 	fs.writeFileSync(registry, templates.map(([directory, name]) =>
-		`- path: "${directory}"\n  name: "${name}"\n`,
+		`- path: "${directory}"\n  name: "${name}"\n${directory.includes("admin") ? "  is_admin: true\n" : ""}`,
 	).join(""));
 	return { root, registry };
 }

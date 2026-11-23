@@ -1,0 +1,894 @@
+/* 后台主题变量与配色 */
+:root {
+    --nz-admin-text: rgb(12, 10, 9);
+    --nz-admin-muted: rgba(12, 10, 9, 0.68);
+    --nz-admin-card: rgba(255, 255, 255, 0.34);
+    --nz-admin-panel: rgba(255, 255, 255, 0.26);
+    --nz-admin-pill: rgba(255, 255, 255, 0.50);
+    --nz-admin-border: rgba(255, 255, 255, 0.42);
+    --nz-admin-border-soft: rgba(255, 255, 255, 0.30);
+    --nz-admin-shadow: 0 18px 46px rgba(15, 23, 42, 0.12);
+    --nz-admin-blue: rgb(37, 150, 255);
+    --nz-admin-blur: blur(14px);
+    --nz-admin-radius-card: 22px;
+    --nz-admin-radius-panel: 16px;
+    --nz-admin-bg-image: none;
+    --nz-admin-mobile-bg-image: var(--nz-admin-bg-image);
+    --nz-admin-desktop-gap: 64px;
+    --nz-admin-content-max: 1500px;
+    --nz-admin-content-width: min(calc(100% - var(--nz-admin-desktop-gap)), var(--nz-admin-content-max));
+}
+
+/* Shadcn tokens drive native bg-primary/bg-input controls. */
+body[data-nz-admin-page="panel"] {
+    --primary: 213 94% 55%;
+    --primary-foreground: 0 0% 100%;
+    --input: 214 32% 91%;
+    --ring: 213 94% 55%;
+    --border: 214 28% 82%;
+    --color-primary: hsl(var(--primary));
+    --color-primary-foreground: hsl(var(--primary-foreground));
+    --color-input: hsl(var(--input));
+    --color-ring: hsl(var(--ring));
+    --color-border: hsl(var(--border));
+}
+
+.dark {
+    --nz-admin-text: rgb(250, 250, 249);
+    --nz-admin-muted: rgba(255, 255, 255, 0.68);
+    --nz-admin-card: rgba(23, 23, 23, 0.62);
+    --nz-admin-panel: rgba(23, 23, 23, 0.54);
+    --nz-admin-pill: rgba(255, 255, 255, 0.12);
+    --nz-admin-border: rgba(255, 255, 255, 0.12);
+    --nz-admin-border-soft: rgba(255, 255, 255, 0.08);
+    --nz-admin-shadow: 0 20px 54px rgba(0, 0, 0, 0.34);
+}
+
+.dark body[data-nz-admin-page="panel"],
+body[data-nz-admin-page="panel"].dark {
+    --primary: 213 94% 58%;
+    --primary-foreground: 0 0% 100%;
+    --input: 220 10% 24%;
+    --ring: 199 89% 72%;
+    --border: 215 16% 32%;
+}
+
+/* 全局背景和字体 */
+html,
+body,
+#root {
+    min-height: 100%;
+    font-family: MiSans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    letter-spacing: 0 !important;
+}
+
+body {
+    position: relative;
+    overflow-x: hidden;
+    background: transparent !important;
+    color: var(--nz-admin-text) !important;
+}
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body::before {
+    background: var(--nz-admin-bg-image) center / cover;
+    filter: saturate(1.04);
+    transform: scale(1.01);
+}
+
+body::after {
+    background: rgba(255, 255, 255, 0.34);
+    backdrop-filter: blur(8px);
+}
+
+.dark body::after {
+    background: rgba(0, 0, 0, 0.66);
+}
+
+#root {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+}
+
+#root > section,
+header,
+nav[aria-label="Main"] img[data-nz-admin-avatar="nav"],
+#root img[data-nz-admin-avatar="profile"] {
+    background: transparent !important;
+}
+
+header {
+    border-bottom-color: transparent !important;
+}
+
+:is(header, nav[aria-label="Main"]) a[href^="/dashboard"] {
+    display: inline-flex !important;
+    height: 48px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+    align-items: center !important;
+    gap: 9px !important;
+    padding: 0 !important;
+    color: var(--nz-admin-text) !important;
+    font-weight: 850 !important;
+    opacity: 1 !important;
+    text-decoration: none !important;
+}
+
+:is(header, nav[aria-label="Main"]) a[href^="/dashboard"] img {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    margin: 0 !important;
+    border-radius: 13px !important;
+    object-fit: cover !important;
+}
+
+:is(header, nav[aria-label="Main"]) [data-nz-admin-brand-text] {
+    max-width: min(42vw, 220px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+/* 顶部导航与品牌 */
+nav[aria-label="Main"] {
+    width: var(--nz-admin-content-width) !important;
+    max-width: var(--nz-admin-content-max) !important;
+    padding: 32px 0 18px !important;
+}
+
+nav[aria-label="Main"] > section:first-of-type,
+nav[aria-label="Main"] a[href^="/dashboard"] {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+nav[aria-label="Main"] > section:first-of-type,
+#root div.max-w-5xl.mx-auto > .px-3 {
+    padding: 0 !important;
+}
+
+nav[aria-label="Main"] > div.flex.mt-4 {
+    margin-top: 14px !important;
+    margin-left: 0 !important;
+    color: var(--nz-admin-text) !important;
+}
+
+nav[aria-label="Main"] > div.flex.mt-4 p:first-child {
+    font-size: 15px !important;
+    font-weight: 850 !important;
+    line-height: 20px !important;
+}
+
+nav[aria-label="Main"] > div.flex.mt-4.list-none {
+    gap: 24px !important;
+    font-weight: 750 !important;
+}
+
+nav[aria-label="Main"] > div.flex.mt-4.list-none :is(a, button) {
+    color: var(--nz-admin-text) !important;
+    opacity: 0.84 !important;
+    white-space: nowrap !important;
+}
+
+nav[aria-label="Main"] a[href="/"],
+nav[aria-label="Main"] > section:first-of-type button {
+    min-height: 36px !important;
+    border-radius: 999px !important;
+    color: var(--nz-admin-text) !important;
+}
+
+nav[aria-label="Main"] a[href="/"] {
+    padding: 0 8px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 0.56 !important;
+}
+
+nav[aria-label="Main"] > section:first-of-type button {
+    width: 36px !important;
+    height: 36px !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), inset 0 1px rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+    opacity: 1 !important;
+}
+
+.dark nav[aria-label="Main"] > section:first-of-type button {
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    background: rgba(0, 0, 0, 0.58) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+nav[aria-label="Main"] a[href="/"]:hover,
+nav[aria-label="Main"] > section:first-of-type button:hover {
+    opacity: 1 !important;
+}
+
+body[data-nz-admin-page="login"] nav[aria-label="Main"] > section:first-of-type button {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+img[data-nz-admin-illustration] {
+    position: fixed !important;
+    top: 82px !important;
+    right: 16px !important;
+    z-index: 5 !important;
+    display: block !important;
+    width: 116px !important;
+    height: 146px !important;
+    object-fit: contain !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    opacity: 0.96 !important;
+    pointer-events: none !important;
+}
+
+nav[aria-label="Main"] img[data-nz-admin-illustration] {
+    position: absolute !important;
+}
+
+nav[aria-label="Main"] img[data-nz-admin-avatar="nav"] {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 999px !important;
+    object-fit: cover !important;
+}
+
+#root img[data-nz-admin-avatar="profile"] {
+    object-fit: contain !important;
+    border-radius: 999px !important;
+    padding: 0 !important;
+}
+
+/* 登录页布局 */
+body[data-nz-admin-page="login"] #root form.space-y-8 {
+    width: min(420px, calc(100vw - 32px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 28px !important;
+    border: 1px solid var(--nz-admin-border) !important;
+    border-radius: var(--nz-admin-radius-card) !important;
+    background: var(--nz-admin-card) !important;
+    box-shadow: var(--nz-admin-shadow) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+}
+
+#root form.space-y-8 button[type="submit"],
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[class*="bg-primary"]:not([role="checkbox"]):not([role="switch"]):not([role="combobox"]):not([class*="w-full"]):not([class*="min-h-10"]),
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[class*="text-primary-foreground"]:not([role="checkbox"]):not([role="switch"]):not([role="combobox"]):not([class*="w-full"]):not([class*="min-h-10"]) {
+    border-color: rgba(37, 150, 255, 0.58) !important;
+    background: linear-gradient(135deg, #2596ff, #2563eb) !important;
+    color: white !important;
+    font-weight: 850 !important;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28), inset 0 1px rgba(255, 255, 255, 0.22) !important;
+}
+
+#root form.space-y-8 button[type="submit"] {
+    height: 42px !important;
+    border-radius: 14px !important;
+}
+
+#root form.space-y-8 button[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.34), inset 0 1px rgba(255, 255, 255, 0.24) !important;
+}
+
+/* 后台主体容器 */
+body[data-nz-admin-page="panel"] #root div.max-w-5xl.mx-auto {
+    width: var(--nz-admin-content-width) !important;
+    max-width: var(--nz-admin-content-max) !important;
+    margin: 0 auto !important;
+    padding: 16px !important;
+    border: 1px solid var(--nz-admin-border) !important;
+    border-radius: var(--nz-admin-radius-card) !important;
+    background: var(--nz-admin-panel) !important;
+    box-shadow: var(--nz-admin-shadow) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+}
+
+/* Page bodies follow the shared admin shell width. */
+body[data-nz-admin-page="panel"] #root div.max-w-5xl.mx-auto > .max-w-7xl {
+    max-width: none !important;
+}
+
+body[data-nz-admin-page="login"] #root div.max-w-5xl.mx-auto {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+body[data-nz-admin-page="login"] #root div.max-w-5xl.mx-auto > div {
+    width: min(420px, calc(100vw - 32px)) !important;
+    max-width: min(420px, calc(100vw - 32px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+}
+
+body[data-nz-admin-page="login"] #root div.max-w-5xl.mx-auto > div > :is(form.space-y-8, section, div) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+#root .max-w-5xl > form,
+#root .max-w-5xl > div:not([role="tablist"]),
+#root h1,
+#root h2 {
+    color: var(--nz-admin-text) !important;
+    letter-spacing: 0 !important;
+}
+
+#root [role="tablist"] {
+    border: 1px solid var(--nz-admin-border) !important;
+    background: var(--nz-admin-card) !important;
+    box-shadow: var(--nz-admin-shadow) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+    display: flex !important;
+    height: auto !important;
+    min-height: 40px !important;
+    grid-template-columns: none !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    overflow: visible !important;
+    border-radius: 16px !important;
+    padding: 4px !important;
+}
+
+#root [role="tab"] {
+    flex: 1 0 max-content !important;
+    min-width: max-content !important;
+    max-width: 100% !important;
+    border-radius: 12px !important;
+    color: var(--nz-admin-text) !important;
+    white-space: nowrap !important;
+}
+
+#root [class*="bg-card"][class*="rounded-lg"][class*="border"] {
+    border: 1px solid var(--nz-admin-border) !important;
+    border-radius: var(--nz-admin-radius-panel) !important;
+    background: var(--nz-admin-card) !important;
+    color: var(--nz-admin-text) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+}
+
+.dark #root [class*="bg-card"][class*="rounded-lg"][class*="border"] {
+    background: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+body[data-nz-admin-page="login"] #root form.space-y-8 :is(label, div),
+#root [class*="bg-card"][class*="rounded-lg"][class*="border"] :is(label, p, span, div),
+[role="dialog"] :is(h1, h2, h3, label, p, span, div) {
+    color: var(--nz-admin-text) !important;
+}
+
+#root [class*="text-muted"],
+[role="dialog"] button.absolute.right-4.top-4 {
+    color: var(--nz-admin-muted) !important;
+}
+
+/* 表单输入和弹窗 */
+:where(#root, body > [data-radix-portal], [role="dialog"]) :is(input:not([type="checkbox"]):not([type="radio"]), textarea, [role="combobox"], button[class*="w-full"][class*="border"][class*="min-h-10"]) {
+    border: 1px solid var(--nz-admin-border-soft) !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.38) !important;
+    color: var(--nz-admin-text) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) :is(input:not([type="checkbox"]):not([type="radio"]), textarea, [role="combobox"], button[class*="w-full"][class*="border"][class*="min-h-10"]) {
+    background: rgba(0, 0, 0, 0.22) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) :is(input, textarea, [role="combobox"]):focus-visible {
+    border-color: rgba(37, 150, 255, 0.72) !important;
+    box-shadow: 0 0 0 3px rgba(37, 150, 255, 0.16) !important;
+}
+
+#root textarea {
+    min-height: 150px !important;
+    resize: vertical !important;
+}
+
+body > [data-radix-portal] [class*="fixed"][class*="inset-0"][class*="bg-black"],
+body > div [class*="fixed"][class*="inset-0"][class*="bg-black"] {
+    background: rgba(8, 10, 16, 0.38) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+[role="dialog"] {
+    width: min(720px, calc(100vw - 32px)) !important;
+    max-width: min(720px, calc(100vw - 32px)) !important;
+    max-height: calc(100vh - 48px) !important;
+    overflow-y: auto !important;
+    border: 1px solid var(--nz-admin-border) !important;
+    border-radius: var(--nz-admin-radius-card) !important;
+    background: rgba(255, 255, 255, 0.34) !important;
+    color: var(--nz-admin-text) !important;
+    box-shadow: 0 22px 64px rgba(15, 23, 42, 0.20) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+    scrollbar-width: thin;
+}
+
+.dark [role="dialog"] {
+    background: rgba(23, 23, 23, 0.72) !important;
+    box-shadow: 0 24px 72px rgba(0, 0, 0, 0.46) !important;
+}
+
+[role="dialog"] button.absolute.right-4.top-4,
+#root button:not([type="submit"]),
+#root a[role="button"] {
+    border-radius: 12px !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[class*="bg-secondary"] {
+    border: 1px solid var(--nz-admin-border-soft) !important;
+    background: var(--nz-admin-pill) !important;
+    color: var(--nz-admin-text) !important;
+}
+
+:where([class*="bg-popover"], [role="listbox"], [cmdk-root], [data-radix-popper-content-wrapper] [class*="border"]) {
+    border-color: var(--nz-admin-border) !important;
+    border-radius: var(--nz-admin-radius-panel) !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    color: var(--nz-admin-text) !important;
+    box-shadow: var(--nz-admin-shadow) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+}
+
+.dark :where([class*="bg-popover"], [role="listbox"], [cmdk-root], [data-radix-popper-content-wrapper] [class*="border"]) {
+    background: rgba(23, 23, 23, 0.86) !important;
+}
+
+body > [data-radix-popper-content-wrapper]:has([cmdk-root]) {
+    width: var(--radix-popper-anchor-width) !important;
+    min-width: 0 !important;
+    max-width: min(var(--radix-popper-anchor-width), calc(100dvw - 32px)) !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+}
+
+body > [data-radix-popper-content-wrapper]:has([cmdk-root]) :where([class*="bg-popover"], [cmdk-root], [cmdk-input-wrapper], [cmdk-list]) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body > [data-radix-popper-content-wrapper]:has([cmdk-root]) [cmdk-input] {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+}
+
+/* 复选框、开关和多选控件 */
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[role="checkbox"],
+:where(#root, body > [data-radix-portal], [role="dialog"]) input[type="checkbox"]:not([aria-hidden="true"]) {
+    appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    border: 1px solid rgba(15, 23, 42, 0.28) !important;
+    border-radius: 5px !important;
+    background: rgba(255, 255, 255, 0.42) !important;
+    color: white !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.16) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[role="checkbox"][data-state="checked"],
+:where(#root, body > [data-radix-portal], [role="dialog"]) input[type="checkbox"]:not([aria-hidden="true"]):checked {
+    border-color: rgba(37, 99, 235, 0.76) !important;
+    background: linear-gradient(135deg, #2596ff, #2563eb) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22), inset 0 1px rgba(255, 255, 255, 0.20) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) button[role="checkbox"],
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) input[type="checkbox"]:not([aria-hidden="true"]) {
+    border-color: rgba(148, 163, 184, 0.58) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) button[role="checkbox"][data-state="checked"],
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) input[type="checkbox"]:not([aria-hidden="true"]):checked {
+    border-color: rgba(96, 165, 250, 0.82) !important;
+    background: linear-gradient(135deg, #38bdf8, #2563eb) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[role="switch"] {
+    width: 44px !important;
+    height: 24px !important;
+    min-width: 44px !important;
+    border: 1px solid rgba(15, 23, 42, 0.18) !important;
+    border-radius: 999px !important;
+    box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[role="switch"][data-state="checked"] {
+    border-color: rgba(37, 150, 255, 0.52) !important;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.20), inset 0 1px rgba(255, 255, 255, 0.18) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) button[role="switch"] {
+    border-color: rgba(148, 163, 184, 0.46) !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.32) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) button[role="switch"][data-state="checked"] {
+    border-color: rgba(125, 211, 252, 0.72) !important;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.32), inset 0 1px rgba(255, 255, 255, 0.22) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[role="switch"] span[data-state] {
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 3px 9px rgba(15, 23, 42, 0.18) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) :is(input[type="radio"], [role="radio"]) {
+    appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    border: 1px solid rgba(15, 23, 42, 0.35) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.42) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) :is(input[type="radio"]:checked, [role="radio"][data-state="checked"]) {
+    border-color: rgba(37, 99, 235, 0.80) !important;
+    background: radial-gradient(circle at center, #fff 0 34%, transparent 38%), linear-gradient(135deg, #2596ff, #2563eb) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) :is(input[type="radio"], [role="radio"]) {
+    border-color: rgba(148, 163, 184, 0.62) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button:is([class*="px-4"], [class*="px-2"]):not([role="checkbox"]):not([role="switch"]):not([class*="bg-primary"]):not([class*="bg-secondary"]):not([class*="w-full"]):not([class*="min-h-10"]) {
+    min-height: 22px !important;
+    border: 1px solid var(--nz-admin-border-soft) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.36) !important;
+    color: var(--nz-admin-text) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.14) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) button:is([class*="px-4"], [class*="px-2"]):not([role="checkbox"]):not([role="switch"]):not([class*="bg-primary"]):not([class*="bg-secondary"]):not([class*="w-full"]):not([class*="min-h-10"]) {
+    background: rgba(255, 255, 255, 0.10) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[class*="w-full"][class*="border"][class*="min-h-10"] [class*="rounded-full"] {
+    border: 1px solid rgba(37, 150, 255, 0.24) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.62) !important;
+    color: var(--nz-admin-text) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.16) !important;
+}
+
+.dark :where(#root, body > [data-radix-portal], [role="dialog"]) button[class*="w-full"][class*="border"][class*="min-h-10"] [class*="rounded-full"] {
+    border-color: rgba(96, 165, 250, 0.28) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+:where(#root, body > [data-radix-portal], [role="dialog"]) button[class*="w-full"][class*="border"][class*="min-h-10"] svg {
+    color: var(--nz-admin-muted) !important;
+    opacity: 0.86 !important;
+}
+
+/* 表格、卡片和页脚 */
+#root table {
+    overflow: hidden !important;
+    border: 1px solid var(--nz-admin-border) !important;
+    border-radius: var(--nz-admin-radius-panel) !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: var(--nz-admin-card) !important;
+    box-shadow: var(--nz-admin-shadow) !important;
+    backdrop-filter: var(--nz-admin-blur) !important;
+}
+
+#root thead tr,
+#root tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.dark #root thead tr {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+#root tbody tr {
+    background: rgba(255, 255, 255, 0.10) !important;
+    transition: background-color 0.18s ease !important;
+}
+
+.dark #root tbody tr {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.dark #root tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.055) !important;
+}
+
+#root tbody tr:hover {
+    background: rgba(37, 150, 255, 0.12) !important;
+}
+
+#root table :is(th, td) {
+    border-color: var(--nz-admin-border-soft) !important;
+    color: var(--nz-admin-text) !important;
+}
+
+footer[data-nz-admin-footer] {
+    width: max-content !important;
+    max-width: calc(100vw - 32px) !important;
+    margin: 18px auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    color: var(--nz-admin-muted) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 16px !important;
+}
+
+footer[data-nz-admin-footer] a {
+    color: var(--nz-admin-blue) !important;
+    font-weight: 850 !important;
+    text-decoration: none !important;
+}
+
+@media (min-width: 769px) {
+    body[data-nz-admin-route="terminal"] #root div.max-w-5xl.mx-auto {
+        padding: 10px 14px 12px !important;
+    }
+
+    body[data-nz-admin-route="terminal"] #root div.max-w-5xl.mx-auto > .px-8 {
+        padding-inline: 0 !important;
+    }
+
+    body[data-nz-admin-route="terminal"] #root div.max-w-5xl.mx-auto > .px-8 > .flex.mt-6.mb-4 {
+        margin-top: 4px !important;
+        margin-bottom: 10px !important;
+        align-items: center !important;
+    }
+
+    body[data-nz-admin-route="terminal"] #root div.max-w-5xl.mx-auto > .px-8 > div[class*="overflow-auto"] {
+        height: var(--nz-terminal-height, calc(100dvh - 340px)) !important;
+        max-height: none !important;
+        margin-bottom: 0 !important;
+        border-radius: 10px !important;
+    }
+
+    body[data-nz-admin-route="terminal"] #root .terminal.xterm,
+    body[data-nz-admin-route="terminal"] #root .xterm-viewport,
+    body[data-nz-admin-route="terminal"] #root .xterm-scrollable-element,
+    body[data-nz-admin-route="terminal"] #root .xterm-screen,
+    body[data-nz-admin-route="terminal"] #root .xterm-rows {
+        height: 100% !important;
+        min-height: 100% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body::before {
+        background-image: var(--nz-admin-mobile-bg-image);
+    }
+
+    header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    nav[aria-label="Main"] {
+        width: calc(100% - 24px) !important;
+        padding: 14px 0 8px !important;
+    }
+
+    nav[aria-label="Main"] a[href^="/dashboard"] {
+        max-width: 100% !important;
+        padding: 0 10px !important;
+    }
+
+    header a[href^="/dashboard"] {
+        height: 40px !important;
+        max-width: none !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        gap: 7px !important;
+    }
+
+    header :is(button, a[role="button"], a[href="/"]) {
+        flex: 0 0 auto !important;
+    }
+
+    :is(header, nav[aria-label="Main"]) a[href^="/dashboard"] img {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+    }
+
+    header a[href^="/dashboard"] img {
+        border-radius: 9px !important;
+    }
+
+    :is(header, nav[aria-label="Main"]) [data-nz-admin-brand-text] {
+        max-width: 100% !important;
+        min-width: 0 !important;
+        font-size: 13px !important;
+        line-height: 17px !important;
+    }
+
+    nav[aria-label="Main"] a[href="/"] {
+        max-width: 72px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    img[data-nz-admin-illustration] {
+        top: 70px !important;
+        right: 10px !important;
+        width: 72px !important;
+        height: 92px !important;
+        opacity: 0.88 !important;
+    }
+
+    body[data-nz-admin-page="panel"] img[data-nz-admin-illustration] {
+        display: none !important;
+    }
+
+    body[data-nz-admin-page="login"] #root form.space-y-8 {
+        margin-top: 28px !important;
+        padding: 20px !important;
+    }
+
+    body[data-nz-admin-page="panel"] #root div.max-w-5xl.mx-auto {
+        width: calc(100% - 24px) !important;
+        max-width: calc(100% - 24px) !important;
+        padding: 12px !important;
+        border-radius: 18px !important;
+    }
+
+    #root [role="tablist"] {
+        gap: 5px !important;
+        padding: 5px !important;
+    }
+
+    #root [role="tab"] {
+        flex: 1 1 calc(50% - 6px) !important;
+        min-width: min(100%, 96px) !important;
+        padding: 7px 9px !important;
+        font-size: 12px !important;
+        line-height: 16px !important;
+    }
+
+    body > [data-radix-popper-content-wrapper] {
+        --radix-popper-anchor-width: calc(100vw - 24px) !important;
+        --radix-select-trigger-width: calc(100vw - 24px) !important;
+        width: calc(100vw - 24px) !important;
+        min-width: 0 !important;
+        max-width: calc(100vw - 24px) !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
+    body > [data-radix-popper-content-wrapper] :where([class*="bg-popover"], [role="listbox"], [cmdk-root], [class*="border"]) {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
+    body > [data-radix-popper-content-wrapper] [data-radix-select-viewport] {
+        max-width: 100% !important;
+    }
+
+    [data-nz-server-config-dialog="true"] {
+        width: calc(100dvw - 24px) !important;
+        max-width: calc(100dvw - 24px) !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    [data-nz-server-config-dialog="true"] :is([data-radix-scroll-area-viewport], form, fieldset, label, input, textarea, button, [role="combobox"]) {
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    [data-nz-server-config-dialog="true"] :is(input, textarea) {
+        width: 100% !important;
+    }
+
+    [data-nz-server-config-dialog="true"] :is(label, p, span) {
+        overflow-wrap: anywhere !important;
+    }
+
+    body > [data-radix-popper-content-wrapper]:has(> [data-nz-server-action-menu="true"]),
+    body > [data-radix-popper-content-wrapper]:has(> [data-nz-install-menu="true"]),
+    [data-nz-server-action-menu="true"],
+    [data-nz-install-menu="true"] {
+        width: max-content !important;
+        min-width: 128px !important;
+        max-width: calc(100dvw - 16px) !important;
+        overflow: visible !important;
+    }
+
+    body > [data-radix-popper-content-wrapper]:has(> [data-nz-install-menu="true"]) {
+        translate: var(--nz-install-menu-shift, 0px) 0 !important;
+    }
+
+    [data-nz-server-action-menu="true"],
+    [data-nz-install-menu="true"] {
+        box-sizing: border-box !important;
+    }
+
+    [data-nz-install-menu="true"] [role="menuitem"] {
+        min-width: 112px !important;
+        min-height: 34px !important;
+        white-space: nowrap !important;
+    }
+
+    [role="dialog"][data-vaul-drawer][data-vaul-drawer-direction="bottom"] {
+        inset-inline: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100dvw !important;
+        min-width: 0 !important;
+        max-width: 100dvw !important;
+        max-height: min(86dvh, calc(100dvh - 24px)) !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        border-radius: 18px 18px 0 0 !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: auto;
+        touch-action: pan-y;
+    }
+
+    [role="dialog"][data-vaul-drawer][data-vaul-drawer-direction="bottom"] :is(a, button) {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}

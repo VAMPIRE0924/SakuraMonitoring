@@ -35,5 +35,6 @@ output="${output:-$workspace_root/dist/dashboard-linux-$arch}"
 build_args=()
 $skip_install && build_args+=(--skip-install)
 "$script_dir/build-sakura-user-dist.sh" "${build_args[@]}"
+"$script_dir/build-sakura-admin-dist.sh"
 "$script_dir/check-sakura-template.sh"
 "$script_dir/build-linux-backend.sh" "$workspace_root" "$version" "$output" "$arch"

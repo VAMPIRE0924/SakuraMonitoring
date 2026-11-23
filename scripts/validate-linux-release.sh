@@ -115,7 +115,7 @@ agent_secret_key: sakura-release-agent-smoke-only
 custom_code: '<style>/* sakura-public-smoke */</style>'
 custom_code_dashboard: '<style>/* sakura-dashboard-appearance-smoke */</style>'
 user_template: sakura-user-dist
-admin_template: admin-dist
+admin_template: sakura-admin-dist
 tsdb:
   data_path: tsdb
 EOF
@@ -162,7 +162,9 @@ if ! grep -Fq 'sakura-public-smoke' "$smoke_root/setting.json"; then
   exit 1
 fi
 
-echo "Startup smoke test: /api/v1/setting responded"
+curl --fail --silent http://127.0.0.1:18080/dashboard/login > "$smoke_root/admin.html"
+grep -Fq 'id="sakura-favicon"' "$smoke_root/admin.html"
+echo "Startup smoke test: settings and Sakura admin login responded"
 
 node "$script_dir/check-h2c-liveness.mjs" http://127.0.0.1:18080
 (

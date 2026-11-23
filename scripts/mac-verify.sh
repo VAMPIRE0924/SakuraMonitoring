@@ -28,6 +28,11 @@ pnpm run test
 pnpm run typecheck
 pnpm run build
 
+cd "$project_root/upstream/sakura-admin"
+pnpm install --frozen-lockfile
+pnpm run test
+pnpm run build
+
 cd "$backend_root"
 go test ./...
 

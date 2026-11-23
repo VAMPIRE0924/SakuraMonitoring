@@ -20,7 +20,7 @@ fi
 
 registry="$workspace/upstream/nezha/service/singleton/frontend-templates.yaml"
 theme_paths="$(sed -nE 's/^[[:space:]]*-[[:space:]]+path:[[:space:]]*"([^"]+)".*/\1/p' "$registry" | sort -u)"
-expected_paths="$(printf '%s\n' admin-dist sakura-user-dist user-dist | sort)"
+expected_paths="$(printf '%s\n' admin-dist sakura-admin-dist sakura-user-dist user-dist | sort)"
 if [[ "$theme_paths" != "$expected_paths" ]]; then
   echo "Theme boundary failed; refusing to generate the public mirror." >&2
   printf '%s\n' "$theme_paths" >&2
@@ -40,6 +40,7 @@ release_scripts=(
   bootstrap-macos.sh
   build-linux-backend.sh
   build-sakura-release.sh
+  build-sakura-admin-dist.sh
   build-sakura-user-dist.sh
   check-sakura-template.sh
   check-h2c-liveness.mjs
@@ -75,6 +76,7 @@ rsync -a \
 rsync -a \
   --exclude .git/ \
   --exclude .github/ \
+  --exclude sakura-admin-dist/ \
   --exclude admin-dist/ \
   --exclude user-dist/ \
   --exclude sakura-user-dist/ \
@@ -84,6 +86,8 @@ rsync -a \
   --exclude '*.log' \
   "$workspace/upstream/nezha/" \
   "$staging/upstream/nezha/"
+
+rsync -a --exclude node_modules/ --exclude dist/ --exclude coverage/ --exclude test-results/ --exclude playwright-report/ "$workspace/upstream/sakura-admin/" "$staging/upstream/sakura-admin/"
 
 find "$staging/upstream" -type f \( -iname '*.md' -o -iname '*.markdown' \) -delete
 

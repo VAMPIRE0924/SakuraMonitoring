@@ -15,5 +15,10 @@
     "go": "1.26.10",
     "node": "24",
     "pnpm": "11.9.0"
+  },
+  "adminFrontend": {
+    "repository": "https://github.com/nezhahq/admin-frontend.git",
+    "version": "v2.6.1",
+    "commit": "034062a93fcd4e9482222b370ce85a926031e710"
   }
 }

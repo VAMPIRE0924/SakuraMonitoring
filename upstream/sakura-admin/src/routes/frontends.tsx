@@ -217,16 +217,20 @@ export default function FrontendsPage() {
                                     <p className="text-muted-foreground text-sm">
                                         {template.custom
                                             ? t("FrontendManager.Custom")
-                                            : t("FrontendManager.BuiltIn")}
+                                            : template.repository === "local"
+                                              ? t("FrontendManager.LocalBuiltIn")
+                                              : t("FrontendManager.BuiltIn")}
                                     </p>
-                                    <a
-                                        href={safeExternalHref(template.repository)}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="text-muted-foreground text-sm break-all underline"
-                                    >
-                                        {template.repository}
-                                    </a>
+                                    {template.repository && template.repository !== "local" && (
+                                        <a
+                                            href={safeExternalHref(template.repository)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-muted-foreground text-sm break-all underline"
+                                        >
+                                            {template.repository}
+                                        </a>
+                                    )}
                                 </div>
                                 <div className="flex gap-2">
                                     {template.custom &&

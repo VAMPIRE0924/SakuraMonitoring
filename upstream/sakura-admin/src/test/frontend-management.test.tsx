@@ -231,3 +231,18 @@ test("failed removal keeps the catalog and does not report success", async () =>
     expect(mocks.refresh).not.toHaveBeenCalled()
     expect(screen.getByText(/Installed user/)).toBeTruthy()
 })
+
+test.each(["user", "admin"])("renders local %s sources as plain text", (role) => {
+    const state = mocks.swr.getMockImplementation()!()
+    state.data.templates.push({
+        path: "sakura-" + role + "-dist",
+        name: "Sakura",
+        repository: "local",
+        is_admin: role === "admin",
+    })
+    renderPage()
+    fireEvent.change(screen.getByLabelText("FrontendManager.Target"), { target: { value: role } })
+    expect(screen.getByText("FrontendManager.LocalBuiltIn")).toBeDefined()
+    expect(screen.queryByRole("link", { name: "local" })).toBeNull()
+    expect(screen.getAllByRole("link", { name: /^https:/ }).length).toBeGreaterThan(0)
+})

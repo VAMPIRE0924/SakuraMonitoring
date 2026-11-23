@@ -342,6 +342,7 @@
         "Available": "已安装与内置前端",
         "Loading": "正在加载前端列表…",
         "Custom": "已安装版本",
+        "LocalBuiltIn": "本地内置",
         "BuiltIn": "内置",
         "Active": "正在使用",
         "Activate": "启用",

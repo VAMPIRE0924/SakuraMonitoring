@@ -342,6 +342,7 @@
         "Available": "Installed and built-in frontends",
         "Loading": "Loading frontends…",
         "Custom": "Installed release",
+        "LocalBuiltIn": "Built-in locally",
         "BuiltIn": "Built-in",
         "Active": "Active",
         "Activate": "Activate",

@@ -85,6 +85,19 @@ func UnblockIP(db *gorm.DB, ip string, uid int64) error {
 	if err != nil {
 		return err
 	}
+
+	// This runs on every successful authentication and there is almost never
+	// a record to remove. SQLite takes its write lock for a DELETE before it
+	// knows whether a row matches, so look first: like CheckIP this is a read
+	// and does not queue behind other writers.
+	var blockTimestamp uint64
+	result := db.Model(&WAF{}).Select("block_timestamp").Where("ip = ? and block_identifier = ?", ipBinary, uid).Limit(1).Find(&blockTimestamp)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return nil
+	}
 	return db.Unscoped().Delete(&WAF{}, "ip = ? and block_identifier = ?", ipBinary, uid).Error
 }
 
@@ -133,6 +146,31 @@ func BlockIP(db *gorm.DB, ip string, reason uint8, uid int64) error {
 		}
 		return tx.Exec("UPDATE nz_waf SET count = ?, block_reason = ?, block_timestamp = ? WHERE ip = ? and block_identifier = ?", count, reason, now, ipBinary, uid).Error
 	})
+}
+
+// PruneExpiredBlocks deletes the records of every address whose block has
+// ended. BlockIP keeps one record per address and identifier, and only a later
+// success from the same address or an administrator removes it, so without
+// this the records of addresses that never come back stay forever. The
+// condition mirrors CheckIP: all records of an address count together, and
+// manual blocks (count 99999) never end.
+func PruneExpiredBlocks(db *gorm.DB) error {
+	// Delete in batches so that a large table does not hold the sqlite write lock for long.
+	const batchSize = 10000
+	for {
+		// TOTAL is SUM in floating point: like powAdd, a huge count saturates instead of overflowing.
+		result := db.Exec(`DELETE FROM nz_waf WHERE ip IN (
+			SELECT ip FROM nz_waf GROUP BY ip
+			HAVING MAX(block_timestamp) + MAX(3, TOTAL(count) * TOTAL(count) * TOTAL(count) * TOTAL(count)) <= ?
+			LIMIT ?)`, time.Now().Unix(), batchSize)
+		if result.Error != nil {
+			return result.Error
+		}
+		// Every address has at least one record, so a short batch was the last one.
+		if result.RowsAffected < batchSize {
+			return nil
+		}
+	}
 }
 
 func powAdd(x, y, z uint64) uint64 {

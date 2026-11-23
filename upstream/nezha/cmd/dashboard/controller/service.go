@@ -289,12 +289,10 @@ func listServerServices(c *gin.Context) ([]*model.ServiceInfos, error) {
 
 	m := singleton.ServerShared.GetList()
 	server, ok := m[serverID]
-	if !ok || server == nil {
+	// Hidden and unknown IDs deliberately share one response so sequential
+	// server IDs cannot be enumerated by callers who may not view them.
+	if !ok || server == nil || !userCanViewServer(c, server) {
 		return nil, singleton.Localizer.ErrorT("server not found")
-	}
-
-	if !userCanViewServer(c, server) {
-		return nil, singleton.Localizer.ErrorT("unauthorized")
 	}
 	_, isMember := c.Get(model.CtxKeyAuthorizedUser)
 
@@ -487,6 +485,12 @@ func createService(c *gin.Context) (uint64, error) {
 	if err := model.ValidateServiceMonitorType(uint64(mf.Type)); err != nil {
 		return 0, err
 	}
+	if err := model.ValidateServiceLatency(mf.MinLatency, mf.MaxLatency); err != nil {
+		return 0, err
+	}
+	if err := model.ValidateServiceTarget(strings.TrimSpace(mf.Target)); err != nil {
+		return 0, err
+	}
 
 	if !isValidServiceCover(mf.Cover) {
 		return 0, singleton.Localizer.ErrorT("permission denied")
@@ -513,6 +517,7 @@ func createService(c *gin.Context) (uint64, error) {
 	m.RecoverTriggerTasks = mf.RecoverTriggerTasks
 	m.FailTriggerTasks = mf.FailTriggerTasks
 
+	normalizeServiceReferences(&m)
 	if err := validateServers(c, &m); err != nil {
 		return 0, err
 	}
@@ -554,6 +559,12 @@ func updateService(c *gin.Context) (any, error) {
 	if err := model.ValidateServiceMonitorType(uint64(mf.Type)); err != nil {
 		return nil, err
 	}
+	if err := model.ValidateServiceLatency(mf.MinLatency, mf.MaxLatency); err != nil {
+		return nil, err
+	}
+	if err := model.ValidateServiceTarget(strings.TrimSpace(mf.Target)); err != nil {
+		return nil, err
+	}
 
 	if !isValidServiceCover(mf.Cover) {
 		return nil, singleton.Localizer.ErrorT("permission denied")
@@ -585,6 +596,7 @@ func updateService(c *gin.Context) (any, error) {
 	m.RecoverTriggerTasks = mf.RecoverTriggerTasks
 	m.FailTriggerTasks = mf.FailTriggerTasks
 
+	normalizeServiceReferences(&m)
 	if err := validateServers(c, &m); err != nil {
 		return 0, err
 	}

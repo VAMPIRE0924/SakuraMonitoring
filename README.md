@@ -2,7 +2,7 @@
 
 Sakura Monitoring 是面向哪吒监控的独立前台主题。主题直接使用哪吒官方 API、WebSocket、路由和数据类型，并与 Dashboard 后端一起编译进 Linux 二进制文件。
 
-当前适配基线记录在 `upstreams.lock.json`：哪吒后端 `v2.6.1`，官方前端契约 `v2.7.0`；Sakura 保持独立主题实现。
+当前适配基线记录在 `upstreams.lock.json`：哪吒后端 `v2.7.0`，官方前端契约 `v2.7.0`；Sakura 保持独立主题实现。
 
 ## 从源码构建
 
